@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Flurl.Http;
 using Flurl.Http.Configuration;
@@ -8,83 +9,199 @@ using Newtonsoft.Json.Serialization;
 
 namespace E621Scraper
 {
+    public class PostsCollection
+    {
+        [JsonProperty("posts")]
+        public List<Post>? Posts { get; set; }
+    }
+    
     public class Post
     {
-        public string Id { get; }
-        public string CreatedAt { get; }
-        public string UpdatedAt { get; }
-        public FileArray File { get; }
-        public PreviewArray Preview { get; }
-        public SampleArray Sample { get; }
-        public ScoreArray Score { get; }
-        public Dictionary<string, List<string>> Tags { get; }
-        public List<string> LockedTags { get; }
-        public string ChangeSeq { get; }
-        public FlagsArray Flags { get; }
-        public string Rating { get; }
-        public string FavCount { get; }
-        public string Sources { get; }
-        public string Pools { get; }
-        public RelationshipArray Relationships { get; }
-        public string ApproverId { get; }
-        public string UploaderId { get; }
-        public string Descriptions { get; }
-        public string CommentCount { get; }
-        public bool IsFavorited { get; }
+        [JsonIgnore] private Dictionary<string, List<string>> _tags = new();
+
+        [JsonProperty("id")]
+        public int Id { get; set; }
+
+        [JsonProperty("created_at")]
+        public string? CreatedAt { get; set; }
+
+        [JsonProperty("updated_at")]
+        public string? UpdatedAt { get; set; }
+
+        [JsonProperty("file")]
+        public FileArray? File { get; set; }
+
+        [JsonProperty("preview")]
+        public PreviewArray? Preview { get; set; }
+
+        [JsonProperty("sample")]
+        public SampleArray? Sample { get; set; }
+
+        [JsonProperty("score")]
+        public ScoreArray? Score { get; set; }
+
+        [JsonProperty("tags")]
+        public Dictionary<string, List<string>> Tags
+        {
+            get
+            {
+                if (!_tags.ContainsKey("all"))
+                {
+                    _tags.Add("all", new List<string>());
+                }
+
+                List<string> allTags = _tags["all"];
+                foreach (var tag in _tags)
+                {
+                    allTags.AddRange(tag.Value);
+                }
+
+                _tags["all"] = allTags.Distinct().ToList();
+
+                return _tags;
+            }
+            set => _tags = value;
+        }
+
+        [JsonProperty("locked_tags")]
+        public List<string>? LockedTags { get; set; }
+
+        [JsonProperty("change_seq")]
+        public string? ChangeSeq { get; set; }
+
+        [JsonProperty("flags")]
+        public FlagsArray? Flags { get; set; }
+
+        [JsonProperty("rating")]
+        public string? Rating { get; set; }
+
+        [JsonProperty("fav_count")]
+        public string? FavCount { get; set; }
+
+        [JsonProperty("sources")]
+        public List<string>? Sources { get; set; }
+
+        [JsonProperty("pools")]
+        public List<string>? Pools { get; set; }
+
+        [JsonProperty("relationships")]
+        public RelationshipArray? Relationships { get; set; }
+
+        [JsonProperty("approver_id")]
+        public string? ApproverId { get; set; }
+
+        [JsonProperty("uploader_id")]
+        public string? UploaderId { get; set; }
+
+        [JsonProperty("descriptions")]
+        public string? Descriptions { get; set; }
+
+        [JsonProperty("comment_count")]
+        public string? CommentCount { get; set; }
+
+        [JsonProperty("is_favorited")]
+        public bool? IsFavorited { get; set; }
 
         public class FileArray
         {
-            public string Width { get; }
-            public string Heigth { get; }
-            public string Ext { get; }
-            public string Size { get; }
-            public string Md5 { get; }
-            public string Url { get; }
+            [JsonProperty("width")]
+            public string? Width { get; set; }
+
+            [JsonProperty("height")]
+            public string? Heigth { get; set; }
+
+            [JsonProperty("ext")]
+            public string? Ext { get; set; }
+
+            [JsonProperty("size")]
+            public string? Size { get; set; }
+
+            [JsonProperty("md5")]
+            public string? Md5 { get; set; }
+
+            [JsonProperty("url")]
+            public string? Url { get; set; }
         }
 
         public class PreviewArray
         {
-            public string Width { get; }
-            public string Height { get; }
-            public string Url { get; }
+            [JsonProperty("width")]
+            public string? Width { get; set; }
+
+            [JsonProperty("height")]
+            public string? Height { get; set; }
+
+            [JsonProperty("url")]
+            public string? Url { get; set; }
         }
 
         public class SampleArray
         {
-            public bool Has { get; }
-            public string Width { get; }
-            public string Height { get; }
-            public string Url { get; }
+            [JsonProperty("has")]
+            public bool? Has { get; set; }
+
+            [JsonProperty("width")]
+            public string? Width { get; set; }
+
+            [JsonProperty("height")]
+            public string? Height { get; set; }
+
+            [JsonProperty("url")]
+            public string? Url { get; set; }
         }
 
         public class ScoreArray
         {
-            public string Up { get; }
-            public string Down { get; }
-            public string Total { get; }
+            [JsonProperty("up")]
+            public string? Up { get; set; }
+
+            [JsonProperty("down")]
+            public string? Down { get; set; }
+
+            [JsonProperty("total")]
+            public string? Total { get; set; }
         }
 
         public class FlagsArray
         {
-            public bool Pending { get; }
-            public bool Flagged { get; }
-            public bool NoteLocked { get; }
-            public bool StatusLocked { get; }
-            public bool RatingLocked { get; }
-            public bool Deleted { get; }
+            [JsonProperty("Pending")]
+            public bool? Pending { get; set; }
+
+            [JsonProperty("flagged")]
+            public bool? Flagged { get; set; }
+
+            [JsonProperty("note_locked")]
+            public bool? NoteLocked { get; set; }
+
+            [JsonProperty("status_locked")]
+            public bool? StatusLocked { get; set; }
+
+            [JsonProperty("rating_locked")]
+            public bool? RatingLocked { get; set; }
+
+            [JsonProperty("deleted")]
+            public bool? Deleted { get; set; }
         }
 
         public class RelationshipArray
         {
-            public string ParentID { get; }
-            public bool HasChildren { get; }
-            public bool HasActiveChildren { get; }
-            public List<string> Children { get; }
+            [JsonProperty("parent_id")]
+            public string? ParentID { get; set; }
+
+            [JsonProperty("has_children")]
+            public bool? HasChildren { get; set; }
+
+            [JsonProperty("has_active_children")]
+            public bool? HasActiveChildren { get; set; }
+
+            [JsonProperty("children")]
+            public List<string>? Children { get; set; }
         }
     }
 
     public class Api
     {
+        private const string UserAgent = "TeleBotTest/0.1 (by Zylinx on e621)";
         private const string BaseUrl = "https://e621.net/";
         private readonly string _apiKey;
         private readonly string _username;
@@ -108,7 +225,7 @@ namespace E621Scraper
             {
                 var resolver = new DefaultContractResolver
                 {
-                    NamingStrategy = new SnakeCaseNamingStrategy()
+                    NamingStrategy = new CamelCaseNamingStrategy()
                 };
                 var jsonSettings = new JsonSerializerSettings
                 {
@@ -119,13 +236,16 @@ namespace E621Scraper
         }
 
         // TODO: Add handling of pages
-        public async Task<List<Post>> ScrapeImages(string lastId)
+        public async Task<PostsCollection> ScrapeImages(string lastId)
         {
-            return await BaseUrl.WithBasicAuth(_username, _apiKey)
-                                .AppendPathSegment("posts")
-                                .SetQueryParam("limit", 320)
-                                .SetQueryParam("page", $"a{lastId}")
-                                .GetJsonAsync<List<Post>>();
+            var result = await BaseUrl.WithBasicAuth(_username, _apiKey)
+                                      .WithHeader("User-Agent", UserAgent)
+                                      .AppendPathSegment("posts.json")
+                                      .SetQueryParam("limit", 370)
+                                      .SetQueryParam("page", $"a{lastId}")
+                                      .GetJsonAsync<PostsCollection>();
+
+            return result;
         }
     }
 }
