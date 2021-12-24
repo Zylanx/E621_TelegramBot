@@ -5,8 +5,6 @@ namespace E621Scraper
 {
     public class E621Scraper
     {
-        public void Main()
-        {
-        }
+        
     }
 }

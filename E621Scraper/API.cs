@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Flurl.Http;
 
 namespace E621Scraper
 {
     public class Post
     {
-        public string ID { get; }
+        public string Id { get; }
         public string CreatedAt { get; }
         public string UpdatedAt { get; }
         public FileArray File { get; }
@@ -79,5 +82,35 @@ namespace E621Scraper
 
     public class API
     {
+        private static readonly string _baseUrl = "https://e621.net/";
+        private readonly string _username;
+        private readonly string _apiKey;
+
+        public API(string username, string apiKey)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentNullException(nameof(username));
+            }
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                throw new ArgumentNullException(nameof(apiKey));
+            }
+
+            _username = username;
+            _apiKey = apiKey;
+        }
+
+        // TODO: Add handling of pages
+        public async Task<List<Post>> ScrapeImages(string lastID)
+        {
+            return await _baseUrl.WithBasicAuth(_username, _apiKey)
+                                 .AppendPathSegment("posts")
+                                 .SetQueryParam("limit", 320)
+                                 .SetQueryParam("page", $"a{lastID}")
+                                 .GetJsonAsync<List<Post>>();
+        }
+        
     }
 }
