@@ -7,6 +7,7 @@ namespace E621Scraper
 {
     public class Post
     {
+
         [JsonIgnore] private Dictionary<string, List<string>> _tags = new();
 
         public int Id { get; set; }

@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E621Scraper", "E621Scraper\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScraperTest", "ScraperTest\ScraperTest.csproj", "{19E1C984-123D-490A-9541-6B7FF6F8F995}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E621TelegramBot", "E621TelegramBot\E621TelegramBot.csproj", "{2B23F819-1FCD-4673-9EE5-5D38C7074A78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E621Shared", "E621Shared\E621Shared.csproj", "{22808D41-A0A0-46FA-8A18-B0816D9E351A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{19E1C984-123D-490A-9541-6B7FF6F8F995}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19E1C984-123D-490A-9541-6B7FF6F8F995}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19E1C984-123D-490A-9541-6B7FF6F8F995}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B23F819-1FCD-4673-9EE5-5D38C7074A78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B23F819-1FCD-4673-9EE5-5D38C7074A78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B23F819-1FCD-4673-9EE5-5D38C7074A78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B23F819-1FCD-4673-9EE5-5D38C7074A78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22808D41-A0A0-46FA-8A18-B0816D9E351A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22808D41-A0A0-46FA-8A18-B0816D9E351A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22808D41-A0A0-46FA-8A18-B0816D9E351A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22808D41-A0A0-46FA-8A18-B0816D9E351A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
