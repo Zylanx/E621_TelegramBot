@@ -4,6 +4,28 @@ namespace E621Scraper
 {
     public class Post
     {
+        public string ID { get; }
+        public string CreatedAt { get; }
+        public string UpdatedAt { get; }
+        public FileArray File { get; }
+        public PreviewArray Preview { get; }
+        public SampleArray Sample { get; }
+        public ScoreArray Score { get; }
+        public Dictionary<string, List<string>> Tags { get; }
+        public List<string> LockedTags { get; }
+        public string ChangeSeq { get; }
+        public FlagsArray Flags { get; }
+        public string Rating { get; }
+        public string FavCount { get; }
+        public string Sources { get; }
+        public string Pools { get; }
+        public RelationshipArray Relationships { get; }
+        public string ApproverId { get; }
+        public string UploaderId { get; }
+        public string Descriptions { get; }
+        public string CommentCount { get; }
+        public bool IsFavorited { get; }
+
         public class FileArray
         {
             public string Width { get; }
@@ -53,32 +75,9 @@ namespace E621Scraper
             public bool HasActiveChildren { get; }
             public List<string> Children { get; }
         }
-
-        public string ID { get; }
-        public string CreatedAt { get; }
-        public string UpdatedAt { get; }
-        public FileArray File { get; }
-        public PreviewArray Preview { get; }
-        public SampleArray Sample { get; }
-        public ScoreArray Score { get; }
-        public Dictionary<string, List<string>> Tags { get; }
-        public List<string> LockedTags { get; }
-        public string ChangeSeq { get; }
-        public FlagsArray Flags { get; }
-        public string Rating { get; }
-        public string FavCount { get; }
-        public string Sources { get; }
-        public string Pools { get; }
-        public RelationshipArray Relationships { get; }
-        public string ApproverId { get; }
-        public string UploaderId { get; }
-        public string Descriptions { get; }
-        public string CommentCount { get; }
-        public bool IsFavorited { get; }
     }
-    
+
     public class API
     {
-        
     }
 }
