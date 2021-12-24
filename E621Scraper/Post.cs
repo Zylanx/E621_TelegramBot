@@ -1,19 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Flurl.Http;
-using Flurl.Http.Configuration;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace E621Scraper
 {
-    public class PostsCollection
-    {
-        public List<Post> Posts { get; set; } = new();
-    }
-
     public class Post
     {
         [JsonIgnore] private Dictionary<string, List<string>> _tags = new();
@@ -32,13 +23,7 @@ namespace E621Scraper
 
         public ScoreArray? Score { get; set; }
 
-        public List<string> AllTags
-        {
-            get
-            {
-                return Tags.Values.SelectMany(x => x).ToList();
-            }
-        }
+        public List<string> AllTags => Tags.Values.SelectMany(x => x).ToList();
 
         public Dictionary<string, List<string>> Tags { get; set; } = new();
 
@@ -136,56 +121,6 @@ namespace E621Scraper
             public bool HasActiveChildren { get; set; }
 
             public List<string>? Children { get; set; }
-        }
-    }
-
-    public class Api
-    {
-        private const string UserAgent = "TeleBotTest/0.1 (by Zylinx on e621)";
-        private const string BaseUrl = "https://e621.net/";
-        private readonly string _apiKey;
-        private readonly string _username;
-
-        public Api(string username, string apiKey)
-        {
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                throw new ArgumentNullException(nameof(username));
-            }
-
-            if (string.IsNullOrWhiteSpace(apiKey))
-            {
-                throw new ArgumentNullException(nameof(apiKey));
-            }
-
-            _username = username;
-            _apiKey = apiKey;
-
-            FlurlHttp.Configure(settings =>
-            {
-                var resolver = new DefaultContractResolver
-                {
-                    NamingStrategy = new SnakeCaseNamingStrategy()
-                };
-                var jsonSettings = new JsonSerializerSettings
-                {
-                    ContractResolver = resolver
-                };
-                settings.JsonSerializer = new NewtonsoftJsonSerializer(jsonSettings);
-            });
-        }
-
-        // TODO: Add handling of pages
-        public async Task<PostsCollection> ScrapeImages(string lastId)
-        {
-            var result = await BaseUrl.WithBasicAuth(_username, _apiKey)
-                                      .WithHeader("User-Agent", UserAgent)
-                                      .AppendPathSegment("posts.json")
-                                      .SetQueryParam("limit", 370)
-                                      .SetQueryParam("page", $"a{lastId}")
-                                      .GetJsonAsync<PostsCollection>();
-
-            return result;
         }
     }
 }
