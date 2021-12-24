@@ -11,190 +11,130 @@ namespace E621Scraper
 {
     public class PostsCollection
     {
-        [JsonProperty("posts")]
-        public List<Post>? Posts { get; set; }
+        public List<Post> Posts { get; set; } = new();
     }
-    
+
     public class Post
     {
         [JsonIgnore] private Dictionary<string, List<string>> _tags = new();
 
-        [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("created_at")]
-        public string? CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        [JsonProperty("updated_at")]
-        public string? UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
-        [JsonProperty("file")]
-        public FileArray? File { get; set; }
+        public FileArray File { get; set; } = new();
 
-        [JsonProperty("preview")]
         public PreviewArray? Preview { get; set; }
 
-        [JsonProperty("sample")]
         public SampleArray? Sample { get; set; }
 
-        [JsonProperty("score")]
         public ScoreArray? Score { get; set; }
 
-        [JsonProperty("tags")]
-        public Dictionary<string, List<string>> Tags
+        public List<string> AllTags
         {
             get
             {
-                if (!_tags.ContainsKey("all"))
-                {
-                    _tags.Add("all", new List<string>());
-                }
-
-                List<string> allTags = _tags["all"];
-                foreach (var tag in _tags)
-                {
-                    allTags.AddRange(tag.Value);
-                }
-
-                _tags["all"] = allTags.Distinct().ToList();
-
-                return _tags;
+                return Tags.Values.SelectMany(x => x).ToList();
             }
-            set => _tags = value;
         }
 
-        [JsonProperty("locked_tags")]
+        public Dictionary<string, List<string>> Tags { get; set; } = new();
+
         public List<string>? LockedTags { get; set; }
 
-        [JsonProperty("change_seq")]
-        public string? ChangeSeq { get; set; }
+        public int ChangeSeq { get; set; }
 
-        [JsonProperty("flags")]
         public FlagsArray? Flags { get; set; }
 
-        [JsonProperty("rating")]
-        public string? Rating { get; set; }
+        public string Rating { get; set; } = default!;
 
-        [JsonProperty("fav_count")]
-        public string? FavCount { get; set; }
+        public int FavCount { get; set; }
 
-        [JsonProperty("sources")]
         public List<string>? Sources { get; set; }
 
-        [JsonProperty("pools")]
         public List<string>? Pools { get; set; }
 
-        [JsonProperty("relationships")]
         public RelationshipArray? Relationships { get; set; }
 
-        [JsonProperty("approver_id")]
-        public string? ApproverId { get; set; }
+        public int? ApproverId { get; set; }
 
-        [JsonProperty("uploader_id")]
-        public string? UploaderId { get; set; }
+        public int UploaderId { get; set; }
 
-        [JsonProperty("descriptions")]
-        public string? Descriptions { get; set; }
+        public string Descriptions { get; set; } = default!;
 
-        [JsonProperty("comment_count")]
-        public string? CommentCount { get; set; }
+        public int CommentCount { get; set; }
 
-        [JsonProperty("is_favorited")]
-        public bool? IsFavorited { get; set; }
+        public bool IsFavorited { get; set; }
 
         public class FileArray
         {
-            [JsonProperty("width")]
-            public string? Width { get; set; }
+            public int Width { get; set; }
 
-            [JsonProperty("height")]
-            public string? Heigth { get; set; }
+            public int Heigth { get; set; }
 
-            [JsonProperty("ext")]
-            public string? Ext { get; set; }
+            public string Ext { get; set; } = default!;
 
-            [JsonProperty("size")]
-            public string? Size { get; set; }
+            public int Size { get; set; }
 
-            [JsonProperty("md5")]
-            public string? Md5 { get; set; }
+            public string Md5 { get; set; } = default!;
 
-            [JsonProperty("url")]
-            public string? Url { get; set; }
+            public string Url { get; set; } = default!;
         }
 
         public class PreviewArray
         {
-            [JsonProperty("width")]
-            public string? Width { get; set; }
+            public int Width { get; set; }
 
-            [JsonProperty("height")]
-            public string? Height { get; set; }
+            public int Height { get; set; }
 
-            [JsonProperty("url")]
-            public string? Url { get; set; }
+            public string Url { get; set; } = default!;
         }
 
         public class SampleArray
         {
-            [JsonProperty("has")]
-            public bool? Has { get; set; }
+            public bool Has { get; set; }
 
-            [JsonProperty("width")]
-            public string? Width { get; set; }
+            public int Width { get; set; }
 
-            [JsonProperty("height")]
-            public string? Height { get; set; }
+            public int Height { get; set; }
 
-            [JsonProperty("url")]
-            public string? Url { get; set; }
+            public string Url { get; set; } = default!;
         }
 
         public class ScoreArray
         {
-            [JsonProperty("up")]
-            public string? Up { get; set; }
+            public int Up { get; set; }
 
-            [JsonProperty("down")]
-            public string? Down { get; set; }
+            public int Down { get; set; }
 
-            [JsonProperty("total")]
-            public string? Total { get; set; }
+            public int Total { get; set; }
         }
 
         public class FlagsArray
         {
-            [JsonProperty("Pending")]
-            public bool? Pending { get; set; }
+            public bool Pending { get; set; }
 
-            [JsonProperty("flagged")]
-            public bool? Flagged { get; set; }
+            public bool Flagged { get; set; }
 
-            [JsonProperty("note_locked")]
-            public bool? NoteLocked { get; set; }
+            public bool NoteLocked { get; set; }
 
-            [JsonProperty("status_locked")]
-            public bool? StatusLocked { get; set; }
+            public bool StatusLocked { get; set; }
 
-            [JsonProperty("rating_locked")]
-            public bool? RatingLocked { get; set; }
+            public bool RatingLocked { get; set; }
 
-            [JsonProperty("deleted")]
-            public bool? Deleted { get; set; }
+            public bool Deleted { get; set; }
         }
 
         public class RelationshipArray
         {
-            [JsonProperty("parent_id")]
-            public string? ParentID { get; set; }
+            public int? ParentId { get; set; }
 
-            [JsonProperty("has_children")]
-            public bool? HasChildren { get; set; }
+            public bool HasChildren { get; set; }
 
-            [JsonProperty("has_active_children")]
-            public bool? HasActiveChildren { get; set; }
+            public bool HasActiveChildren { get; set; }
 
-            [JsonProperty("children")]
             public List<string>? Children { get; set; }
         }
     }
@@ -225,7 +165,7 @@ namespace E621Scraper
             {
                 var resolver = new DefaultContractResolver
                 {
-                    NamingStrategy = new CamelCaseNamingStrategy()
+                    NamingStrategy = new SnakeCaseNamingStrategy()
                 };
                 var jsonSettings = new JsonSerializerSettings
                 {
