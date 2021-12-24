@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Flurl.Http;
+using Flurl.Http.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace E621Scraper
 {
@@ -80,13 +83,13 @@ namespace E621Scraper
         }
     }
 
-    public class API
+    public class Api
     {
-        private static readonly string _baseUrl = "https://e621.net/";
-        private readonly string _username;
+        private const string BaseUrl = "https://e621.net/";
         private readonly string _apiKey;
+        private readonly string _username;
 
-        public API(string username, string apiKey)
+        public Api(string username, string apiKey)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
@@ -100,17 +103,29 @@ namespace E621Scraper
 
             _username = username;
             _apiKey = apiKey;
+
+            FlurlHttp.Configure(settings =>
+            {
+                var resolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                };
+                var jsonSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = resolver
+                };
+                settings.JsonSerializer = new NewtonsoftJsonSerializer(jsonSettings);
+            });
         }
 
         // TODO: Add handling of pages
-        public async Task<List<Post>> ScrapeImages(string lastID)
+        public async Task<List<Post>> ScrapeImages(string lastId)
         {
-            return await _baseUrl.WithBasicAuth(_username, _apiKey)
-                                 .AppendPathSegment("posts")
-                                 .SetQueryParam("limit", 320)
-                                 .SetQueryParam("page", $"a{lastID}")
-                                 .GetJsonAsync<List<Post>>();
+            return await BaseUrl.WithBasicAuth(_username, _apiKey)
+                                .AppendPathSegment("posts")
+                                .SetQueryParam("limit", 320)
+                                .SetQueryParam("page", $"a{lastId}")
+                                .GetJsonAsync<List<Post>>();
         }
-        
     }
 }
