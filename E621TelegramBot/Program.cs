@@ -1,3 +1,13 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using System.Threading.Tasks;
 
-Console.WriteLine("Hello, World!");
+namespace E621TelegramBot
+{
+    public static class E621TelegramBot
+    {
+        private const string ApiKey = "";
+
+        public static async Task Main(string[] args)
+        {
+        }
+    }
+}
