@@ -14,4 +14,8 @@
         <PackageReference Include="SQLite" Version="3.13.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\E621Shared\E621Shared.csproj"/>
+    </ItemGroup>
+
 </Project>

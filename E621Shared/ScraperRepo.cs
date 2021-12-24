@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 
@@ -7,7 +8,7 @@ namespace E621Shared
     {
         private readonly ConnectionProvider _con;
 
-        public SubscriberRepo(ConnectionProvider provider)
+        public ScraperRepo(ConnectionProvider provider)
         {
             _con = provider;
             Init();
@@ -17,8 +18,8 @@ namespace E621Shared
         {
             //real crap intro subscription table.
             string query = "create table if not exists Scraper(LastPolledId INTEGER)";
-            string query2 = "insert into Scraper (LastPolledId) values (0)";
-
+            //insert a null if row doesn't exist already. Maybe this is right if lucky
+            string query2 = "INSERT INTO Scraper (LastPolledId) SELECT NULL WHERE NOT EXISTS (SELECT * FROM Scraper)";
             using (var con = _con.Get())
             {
                 con.Execute(query);
@@ -29,23 +30,20 @@ namespace E621Shared
         //lets do command query seperation, stuff either modifies the dbase, or returns data, not both.
 
         //Allows the bot to list all your subscriptions
-        public Task<int> GetLastPolledId()
+        public async Task<int?> GetLastPolledId()
         {
             string query = "select LastPolledId from Scraper";
-            using (var con = _con.Get())
-            {
-                return con.QueryAsync<int>(query).First();
-            }
+
+            using var con = _con.Get();
+            return (await con.QueryAsync<int?>(query)).First();
         }
 
         //Allows the bot to list all your subscriptions
-        public Task<int> UpdateLastPolledId()
+        public Task<int> UpdateLastPolledId(int id)
         {
-            string query = "select LastPolledId from Scraper";
-            using (var con = _con.Get())
-            {
-                return con.QueryAsync<int>(query).First();
-            }
+            string query = "update Scraper set LastPolledId = @id";
+            using var con = _con.Get();
+            return con.ExecuteAsync(query, new {id});
         }
     }
 }

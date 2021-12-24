@@ -1,25 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 using Dapper;
 
 namespace E621Shared
 {
-    public class ConnectionProvider
-    {
-        public IDbConnection Get()
-        {
-            //Dapper opens the connection for you if there is need for that.
-            return
-                SQLiteConnection(
-                    "Data Source=mydb.db;Version=3;"); //todo, make this configurable, if there is ever need
-        }
-    }
-
     public class Subscription
     {
-        public string TelegramId { get; set; }
-        public string Tag { get; set; }
+        public string? TelegramId { get; set; }
+        public string? Tag { get; set; }
     }
 
     public class SubscriberRepo
@@ -45,12 +33,12 @@ namespace E621Shared
         //lets do command query seperation, stuff either modifies the dbase, or returns data, not both.
 
         //Allows the bot to list all your subscriptions
-        public Task<List<Subscription>> ListSubscriptionsForTelegramUser(string telegramId)
+        public Task<IEnumerable<Subscription>> ListSubscriptionsForTelegramUser(string telegramId)
         {
             string query = "select * from subscriptions where TelegramId = @telegramId";
 
             using var con = _con.Get();
-            return con.QueryAsync<Subscription>(query, new {telegramId}).ToList();
+            return con.QueryAsync<Subscription>(query, new {telegramId});
         }
 
         public Task<int> CreateSubscription(Subscription subscription)
