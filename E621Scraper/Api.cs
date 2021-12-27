@@ -10,11 +10,9 @@ namespace E621Scraper
 {
     public class Api
     {
-        private const string UserAgent = "TeleBotTest/0.1 (by Zylinx on e621)";
         private const string BaseUrl = "https://e621.net/";
-        private const int MaxPostsPerRequest = 320;
-        private readonly string _username;
         private readonly string _apiKey;
+        private readonly string _username;
 
         public Api(string username, string apiKey)
         {
@@ -53,7 +51,7 @@ namespace E621Scraper
             }
 
             return Request().AppendPathSegment("posts.json")
-                            .SetQueryParams(new {limit = MaxPostsPerRequest, page = $"b{id}"})
+                            .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"b{id}"})
                             .GetJsonAsync<PostsCollection>();
         }
 
@@ -66,15 +64,14 @@ namespace E621Scraper
             }
 
             return Request().AppendPathSegment("posts.json")
-                            .SetQueryParams(new {limit = MaxPostsPerRequest, page = $"a{lastId}"})
+                            .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"a{lastId}"})
                             .GetJsonAsync<PostsCollection>();
         }
 
         public Task<PostsCollection> ScrapeImages()
         {
             return Request().AppendPathSegment("posts.json")
-                            .SetQueryParam("limit", MaxPostsPerRequest)
-                            .SetQueryParam("page", 3)
+                            .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
                             .GetJsonAsync<PostsCollection>();
         }
 
@@ -108,7 +105,7 @@ namespace E621Scraper
         private IFlurlRequest Request()
         {
             return BaseUrl.WithBasicAuth(_username, _apiKey)
-                          .WithHeader("User-Agent", UserAgent);
+                          .WithHeader("User-Agent", Config.UserAgent);
         }
     }
 }
