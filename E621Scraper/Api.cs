@@ -106,7 +106,7 @@ namespace E621Scraper
             IFlurlRequest request = BaseUrl.WithHeader("User-Agent", Config.UserAgent);
             if (!string.IsNullOrEmpty(_config.Username) && !string.IsNullOrEmpty(_config.ApiKey))
             {
-                request = BaseUrl.WithBasicAuth(_config.Username, _config.ApiKey);
+                request = request.WithBasicAuth(_config.Username, _config.ApiKey);
             }
 
             return request;
