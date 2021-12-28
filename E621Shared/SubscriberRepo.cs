@@ -22,9 +22,8 @@ namespace E621Shared
 
         private void Init()
         {
-            //real crap intro subscription table.
             string query =
-                "create table if not exists Subscriptions(Id INTEGER PRIMARY KEY, TelegramId TEXT, Tag TEXT)";
+                "create table if not exists Subscriptions(Id INTEGER PRIMARY KEY, UserId TEXT, Tag TEXT)";
 
             using var con = _con.Get();
             con.Execute(query);
@@ -33,18 +32,18 @@ namespace E621Shared
         //lets do command query seperation, stuff either modifies the dbase, or returns data, not both.
 
         //Allows the bot to list all your subscriptions
-        public Task<IEnumerable<Subscription>> ListSubscriptionsForTelegramUser(string telegramId)
+        public Task<IEnumerable<Subscription>> ListSubscriptionsForTelegramUser(string userId)
         {
-            string query = "select * from subscriptions where TelegramId = @telegramId";
+            string query = "select * from subscriptions where UserId = @userId";
 
             using var con = _con.Get();
-            return con.QueryAsync<Subscription>(query, new {telegramId});
+            return con.QueryAsync<Subscription>(query, new {userId});
         }
 
         public Task<int> CreateSubscription(Subscription subscription)
         {
             string query =
-                "insert into subscription (TelegramId, Tag) values (@TelegramId, @Tag)"; //case sensitive match? not sure.
+                "insert into subscription (UserId, Tag) values (@UserId, @Tag)";
 
             using var con = _con.Get();
             return con.ExecuteAsync(query, subscription);
@@ -58,12 +57,12 @@ namespace E621Shared
             return con.QueryAsync<Subscription>(query);
         }
 
-        public Task DeleteSubscription(int id, string telegramId) //Must pass user doing the delete request
+        public Task DeleteSubscription(int id, string userId) //Must pass user doing the delete request
         {
-            string query = "Delete from subscriptions where Id = @id and TelegramId = @telegramId";
+            string query = "Delete from subscriptions where Id = @id and UserId = @userId";
 
             using var con = _con.Get();
-            return con.ExecuteAsync(query, new {id, telegramId});
+            return con.ExecuteAsync(query, new {id, userId});
         }
     }
 }
