@@ -24,4 +24,10 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+        <Compile Remove="PostsCollection.cs"/>
+        <Compile Remove="ApiConfig.cs"/>
+        <Compile Remove="ScraperConfig.cs"/>
+    </ItemGroup>
+
 </Project>

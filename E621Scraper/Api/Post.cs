@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace E621Scraper
+namespace E621Scraper.Api
 {
     public class Post
     {

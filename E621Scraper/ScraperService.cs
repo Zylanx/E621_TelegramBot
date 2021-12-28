@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using E621Scraper.Configs;
 using E621Shared;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -9,12 +10,12 @@ namespace E621Scraper
 {
     public class ScraperService : IHostedService
     {
-        private readonly Api _api;
+        private readonly Api.Api _api;
         private readonly ILogger<ScraperService> _log;
         private readonly ScraperConfig _scraperConfig;
         private readonly ScraperRepo _scraperRepo;
 
-        public ScraperService(Api api, ScraperRepo scraperRepo, ScraperConfig scraperConfig,
+        public ScraperService(Api.Api api, ScraperRepo scraperRepo, ScraperConfig scraperConfig,
                               ILogger<ScraperService> log)
         {
             _api = api;
@@ -44,7 +45,14 @@ namespace E621Scraper
                     _log.LogInformation("No new posts to display yet!");
                 }
 
-                await Task.Delay(_scraperConfig.PollIntervalSeconds * 1000, cancellationToken);
+                try
+                {
+                    await Task.Delay((int)_scraperConfig.PollIntervalSeconds! * 1000, cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    ;
+                }
 
                 if (cancellationToken.IsCancellationRequested)
                 {

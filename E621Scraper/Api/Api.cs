@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using E621Scraper.Configs;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace E621Scraper
+namespace E621Scraper.Api
 {
     public class Api
     {
@@ -15,12 +16,7 @@ namespace E621Scraper
 
         public Api(ApiConfig config)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-
-            _config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
 
             FlurlHttp.Configure(settings =>
             {
@@ -65,7 +61,7 @@ namespace E621Scraper
                                   .GetJsonAsync<PostsCollection>();
         }
 
-        public async Task<PostsCollection> ScrapeImages()
+        private async Task<PostsCollection> ScrapeImages()
         {
             await Task.Delay(1000);
 
@@ -80,8 +76,7 @@ namespace E621Scraper
         public async Task<List<Post>> GetImagesSinceLastPoll(int? lastPollId)
         {
             List<Post> results = new();
-            while (
-                true) // I think this logic might still be a bit fucked, lets fuck off this nullable lastpollid shit and just do an upfront call seperate
+            while (true)
             {
                 var posts = (await ScrapeImagesAfterId(lastPollId)).Posts; //Gets posts in oldest to newest order.
 

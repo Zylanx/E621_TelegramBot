@@ -1,4 +1,4 @@
-﻿namespace E621Scraper
+﻿namespace E621Scraper.Configs
 {
     public class ApiConfig
     {

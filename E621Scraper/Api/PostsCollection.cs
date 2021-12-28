@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace E621Scraper
+namespace E621Scraper.Api
 {
     public class PostsCollection
     {

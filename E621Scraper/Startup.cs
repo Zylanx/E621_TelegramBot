@@ -2,6 +2,7 @@
 // Don't expect quality code.
 
 using System.Threading.Tasks;
+using E621Scraper.Configs;
 using E621Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,7 +41,7 @@ namespace E621Scraper
             services.AddTransient(_ => E621Shared.Config.DatabaseConfig);
             services.AddTransient(_ => Configuration.GetRequiredSection("ScraperConfig").Get<ScraperConfig>());
             services.AddTransient<ScraperRepo>();
-            services.AddTransient<Api>();
+            services.AddTransient<Api.Api>();
         }
     }
 }
