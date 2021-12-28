@@ -46,7 +46,7 @@ namespace E621Scraper
             await Task.Delay(1000);
 
             return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new { limit = Config.MaxPostsPerRequest, page = $"b{id}" })
+                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"b{id}"})
                                   .GetJsonAsync<PostsCollection>();
         }
 
@@ -61,7 +61,7 @@ namespace E621Scraper
             await Task.Delay(1000);
 
             return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new { limit = Config.MaxPostsPerRequest, page = $"a{lastId}" })
+                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"a{lastId}"})
                                   .GetJsonAsync<PostsCollection>();
         }
 
@@ -70,7 +70,7 @@ namespace E621Scraper
             await Task.Delay(1000);
 
             return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new { limit = Config.MaxPostsPerRequest, page = "2" })
+                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
                                   .GetJsonAsync<PostsCollection>();
         }
 

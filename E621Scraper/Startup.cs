@@ -1,7 +1,6 @@
 ﻿// This is a janky test, not intended to work well or be well documented.
 // Don't expect quality code.
 
-using System;
 using System.Threading.Tasks;
 using E621Shared;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +31,7 @@ namespace E621Scraper
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
 
             var configuration = builder.Build();
-            
+
             services.AddHostedService<ScraperService>();
             services.AddSingleton<ConnectionProvider>();
             services.AddTransient(_ => configuration.GetRequiredSection("ApiConfig").Get<ApiConfig>());
