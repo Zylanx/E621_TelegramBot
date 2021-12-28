@@ -25,7 +25,7 @@ namespace E621Scraper
             var configuration = builder.Build();
 
             services.AddHostedService<ScraperService>();
-            services.AddScoped<ConnectionProvider>();
+            services.AddSingleton<ConnectionProvider>();
             services.AddTransient(x => configuration.GetRequiredSection("ApiConfig").Get<ApiConfig>());
             services.AddTransient<ScraperRepo>();
             services.AddTransient<Api>();
