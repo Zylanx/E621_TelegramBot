@@ -13,6 +13,7 @@ namespace E621TelegramBot
     public static class Startup
     {
         private static IConfigurationRoot? Configuration { get; set; }
+
         public static async Task Main(string[] args)
         {
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);

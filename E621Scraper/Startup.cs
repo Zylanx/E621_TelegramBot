@@ -13,14 +13,11 @@ namespace E621Scraper
 {
     public static class Startup
     {
-        private static IConfigurationRoot? Configuration { get; set; }
-
         public static async Task Main(string[] args)
         {
-            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
-            Configuration = builder.Build();
-
             await Host.CreateDefaultBuilder(args)
+                      .ConfigureAppConfiguration(configurationBuilder =>
+                          configurationBuilder.AddJsonFile("appsettings.json", false, true))
                       .ConfigureServices(ConfigureServices)
                       .ConfigureLogging(ConfigureLogging)
                       .RunConsoleAsync();
@@ -34,12 +31,12 @@ namespace E621Scraper
 
         private static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-
             services.AddHostedService<ScraperService>();
             services.AddSingleton<ConnectionProvider>();
-            services.AddTransient(_ => Configuration.GetRequiredSection("ApiConfig").Get<ApiConfig>());
+            services.AddTransient(provider => provider.GetRequiredService<IConfiguration>().BindSection<ApiConfig>());
             services.AddTransient(_ => E621Shared.Config.DatabaseConfig);
-            services.AddTransient(_ => Configuration.GetRequiredSection("ScraperConfig").Get<ScraperConfig>());
+            services.AddTransient(
+                provider => provider.GetRequiredService<IConfiguration>().BindSection<ScraperConfig>());
             services.AddTransient<ScraperRepo>();
             services.AddTransient<Api.Api>();
         }
