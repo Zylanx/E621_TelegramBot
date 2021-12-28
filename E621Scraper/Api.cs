@@ -22,16 +22,6 @@ namespace E621Scraper
                 throw new ArgumentNullException(nameof(config));
             }
 
-            if (string.IsNullOrWhiteSpace(config.Username))
-            {
-                throw new ArgumentNullException(nameof(config.Username));
-            }
-
-            if (string.IsNullOrWhiteSpace(config.ApiKey))
-            {
-                throw new ArgumentNullException(nameof(config.ApiKey));
-            }
-
             _config = config;
 
             FlurlHttp.Configure(settings =>
@@ -58,7 +48,7 @@ namespace E621Scraper
             await Task.Delay(1000);
 
             return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"b{id}"})
+                                  .SetQueryParams(new { limit = Config.MaxPostsPerRequest, page = $"b{id}" })
                                   .GetJsonAsync<PostsCollection>();
         }
 
@@ -73,7 +63,7 @@ namespace E621Scraper
             await Task.Delay(1000);
 
             return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"a{lastId}"})
+                                  .SetQueryParams(new { limit = Config.MaxPostsPerRequest, page = $"a{lastId}" })
                                   .GetJsonAsync<PostsCollection>();
         }
 
@@ -82,7 +72,7 @@ namespace E621Scraper
             await Task.Delay(1000);
 
             return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
+                                  .SetQueryParams(new { limit = Config.MaxPostsPerRequest, page = "2" })
                                   .GetJsonAsync<PostsCollection>();
         }
 
@@ -113,8 +103,13 @@ namespace E621Scraper
 
         private IFlurlRequest Request()
         {
-            return BaseUrl.WithBasicAuth(_config.Username, _config.ApiKey)
-                          .WithHeader("User-Agent", Config.UserAgent);
+            IFlurlRequest request = BaseUrl.WithHeader("User-Agent", Config.UserAgent);
+            if (!string.IsNullOrEmpty(_config.Username) && !string.IsNullOrEmpty(_config.ApiKey))
+            {
+                request = BaseUrl.WithBasicAuth(_config.Username, _config.ApiKey);
+            }
+
+            return request;
         }
     }
 }

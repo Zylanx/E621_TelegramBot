@@ -30,7 +30,7 @@ namespace E621Scraper
             while (true) //Simulate a rough polling loop, though we'll probably do this as a cronjob idk
             {
                 var lastPollId = await _scraperRepo.GetLastPolledId();
-                _log.LogDebug($"Getting images using last: ${lastPollId}");
+                _log.LogDebug($"Getting images using last: {lastPollId}");
                 var results = await _api.GetImagesSinceLastPoll(lastPollId);
 
                 if (results.Count > 0)
