@@ -26,6 +26,7 @@ namespace E621TelegramBot
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
+            _log.LogInformation("Bot stoped");
             return Task.CompletedTask;
         }
     }
