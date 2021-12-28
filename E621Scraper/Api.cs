@@ -78,15 +78,15 @@ namespace E621Scraper
 
         //Get all pages from last time we polled otherwise just get max pages.
         //The trick here is we have to keep fetching until we see lastPollId in the list then stop and remove any shit smaller than that.
-        public async Task<List<Post>> GetImagesSinceLastPoll(int lastPollId)
+        public async Task<List<Post>> GetImagesSinceLastPoll(int? lastPollId)
         {
             List<Post> results = new();
             while (
                 true) // I think this logic might still be a bit fucked, lets fuck off this nullable lastpollid shit and just do an upfront call seperate
             {
-                var pages = (await ScrapeImagesAfterId(lastPollId)).Posts; //Gets posts in oldest to newest order.
+                var posts = (await ScrapeImagesAfterId(lastPollId)).Posts; //Gets posts in oldest to newest order.
 
-                if (pages.Count == 0)
+                if (posts.Count == 0)
                 {
                     //No posts, bail right away.
                     break;
@@ -94,9 +94,9 @@ namespace E621Scraper
 
                 await Task.Delay(1000);
 
-                results.AddRange(pages);
+                results.AddRange(posts);
 
-                lastPollId = pages[0].Id; //Get the next newest batch, keep going until there is no newer posts.
+                lastPollId = posts[0].Id; //Get the next newest batch, keep going until there is no newer posts.
             }
 
             return results; //done.
