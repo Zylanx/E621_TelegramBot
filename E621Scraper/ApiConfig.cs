@@ -8,7 +8,7 @@ namespace E621Scraper
 {
     public class ApiConfig
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
     }
 }
