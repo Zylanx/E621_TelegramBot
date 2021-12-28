@@ -1,24 +1,20 @@
-﻿using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using E621Shared;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace E621TelegramBot
 {
     public class TelegramBotService : IHostedService
     {
-        private readonly ScraperRepo _scraperRepo;
         private readonly ILogger<TelegramBotService> _log;
+        private readonly ScraperRepo _scraperRepo;
 
         public TelegramBotService(ScraperRepo scraperRepo, ILogger<TelegramBotService> log)
         {
             _scraperRepo = scraperRepo;
-            this._log = log;
+            _log = log;
         }
 
 

@@ -35,7 +35,7 @@ namespace E621TelegramBot
 
             services.AddHostedService<TelegramBotService>();
             services.AddSingleton<ConnectionProvider>();
-            services.AddTransient(_ => E621Shared.Config.DatabaseConfig);
+            services.AddTransient(_ => Config.DatabaseConfig);
             services.AddTransient(_ => configuration.GetRequiredSection("BotConfig").Get<BotConfig>());
             services.AddTransient<ScraperRepo>();
         }
