@@ -13,23 +13,26 @@ namespace E621Scraper
         private const string UserAgent = "TeleBotTest/0.1 (by Zylinx on e621)";
         private const string BaseUrl = "https://e621.net/";
         private const int MaxPostsPerRequest = 320;
-        private readonly string _username;
-        private readonly string _apiKey;
+        private readonly ApiConfig _config;
 
-        public Api(string username, string apiKey)
+        public Api(ApiConfig config)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if(config == null)
             {
-                throw new ArgumentNullException(nameof(username));
+                throw new ArgumentNullException(nameof(config));
             }
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (string.IsNullOrWhiteSpace(config.Username))
             {
-                throw new ArgumentNullException(nameof(apiKey));
+                throw new ArgumentNullException(nameof(config.Username));
             }
 
-            _username = username;
-            _apiKey = apiKey;
+            if (string.IsNullOrWhiteSpace(config.Password))
+            {
+                throw new ArgumentNullException(nameof(config.Password));
+            }
+
+            this._config = config;
 
             FlurlHttp.Configure(settings =>
             {
@@ -107,7 +110,7 @@ namespace E621Scraper
 
         private IFlurlRequest Request()
         {
-            return BaseUrl.WithBasicAuth(_username, _apiKey)
+            return BaseUrl.WithBasicAuth(_config.Username, _config.Password)
                           .WithHeader("User-Agent", UserAgent);
         }
     }
