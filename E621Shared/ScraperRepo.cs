@@ -16,9 +16,8 @@ namespace E621Shared
 
         private void Init()
         {
-            //real crap intro subscription table.
             string query = "create table if not exists Scraper(LastPolledId INTEGER)";
-            //insert a null if row doesn't exist already. Maybe this is right if lucky
+            //insert a null if row doesn't exist already.
             string query2 = "INSERT INTO Scraper (LastPolledId) SELECT NULL WHERE NOT EXISTS (SELECT * FROM Scraper)";
             using (var con = _con.Get())
             {
@@ -29,7 +28,6 @@ namespace E621Shared
 
         //lets do command query seperation, stuff either modifies the dbase, or returns data, not both.
 
-        //Allows the bot to list all your subscriptions
         public async Task<int?> GetLastPolledId()
         {
             string query = "select LastPolledId from Scraper";
@@ -38,7 +36,6 @@ namespace E621Shared
             return (await con.QueryAsync<int?>(query)).First();
         }
 
-        //Allows the bot to list all your subscriptions
         public Task<int> UpdateLastPolledId(int id)
         {
             string query = "update Scraper set LastPolledId = @id";
