@@ -1,4 +1,4 @@
-﻿namespace E621TelegramBot
+﻿namespace E621TelegramBot.Commands.Subscription
 {
     public class DeleteSubscription
     {
