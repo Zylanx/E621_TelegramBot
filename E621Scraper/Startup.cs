@@ -23,10 +23,11 @@ namespace E621Scraper
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
 
             var configuration = builder.Build();
-
+            
             services.AddHostedService<ScraperService>();
             services.AddSingleton<ConnectionProvider>();
-            services.AddTransient(x => configuration.GetRequiredSection("ApiConfig").Get<ApiConfig>());
+            services.AddTransient(_ => configuration.GetRequiredSection("ApiConfig").Get<ApiConfig>());
+            services.AddTransient(_ => E621Shared.Config.DatabaseConfig);
             services.AddTransient<ScraperRepo>();
             services.AddTransient<Api>();
         }
