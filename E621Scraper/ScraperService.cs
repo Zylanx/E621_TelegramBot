@@ -11,28 +11,43 @@ namespace E621Scraper
     public class ScraperService : IHostedService
     {
         private readonly Api.Api _api;
+        private readonly IHostApplicationLifetime _lifetime;
         private readonly ILogger<ScraperService> _log;
         private readonly ScraperConfig _scraperConfig;
         private readonly ScraperRepo _scraperRepo;
 
-        public ScraperService(Api.Api api, ScraperRepo scraperRepo, ScraperConfig scraperConfig,
-                              ILogger<ScraperService> log)
+        public ScraperService(IHostApplicationLifetime lifetime, Api.Api api, ScraperRepo scraperRepo,
+                              ScraperConfig scraperConfig, ILogger<ScraperService> log)
         {
+            _lifetime = lifetime;
             _api = api;
             _scraperRepo = scraperRepo;
             _scraperConfig = scraperConfig;
             _log = log;
         }
 
-
-        public async Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
-            // Should this be registering on ApplicationStarted or is this fine?
+            _lifetime.ApplicationStarted.Register(() =>
+            {
+                Task.Run(async () => { await ScrapeImages(cancellationToken); }, cancellationToken);
+            });
+
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        private async Task ScrapeImages(CancellationToken cancellationToken)
+        {
             while (true) //Simulate a rough polling loop, though we'll probably do this as a cronjob idk
             {
                 var lastPollId = await _scraperRepo.GetLastPolledId();
                 _log.LogDebug($"Getting images using last: {lastPollId}");
-                var results = await _api.GetImagesSinceLastPoll(lastPollId);
+                var results = await _api.GetImagesSinceLastPoll(lastPollId, cancellationToken);
 
                 if (results.Count > 0)
                 {
@@ -59,11 +74,6 @@ namespace E621Scraper
                     return;
                 }
             }
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
         }
     }
 }
