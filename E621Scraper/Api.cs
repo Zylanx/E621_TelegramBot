@@ -11,9 +11,7 @@ namespace E621Scraper
     public class Api
     {
         private const string BaseUrl = "https://e621.net/";
-        private readonly string _apiKey;
         private readonly ApiConfig _config;
-        private readonly string _username;
 
         public Api(ApiConfig config)
         {
