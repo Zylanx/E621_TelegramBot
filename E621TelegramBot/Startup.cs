@@ -12,8 +12,12 @@ namespace E621TelegramBot
 {
     public static class Startup
     {
+        private static IConfigurationRoot? Configuration { get; set; }
         public static async Task Main(string[] args)
         {
+            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
+            Configuration = builder.Build();
+
             await Host.CreateDefaultBuilder(args)
                       .ConfigureServices(ConfigureServices)
                       .ConfigureLogging(ConfigureLogging)
@@ -36,7 +40,7 @@ namespace E621TelegramBot
             services.AddHostedService<TelegramBotService>();
             services.AddSingleton<ConnectionProvider>();
             services.AddTransient(_ => Config.DatabaseConfig);
-            services.AddTransient(_ => configuration.GetRequiredSection("BotConfig").Get<BotConfig>());
+            services.AddTransient(_ => Configuration.GetRequiredSection("BotConfig").Get<BotConfig>());
             services.AddTransient<ScraperRepo>();
         }
     }
