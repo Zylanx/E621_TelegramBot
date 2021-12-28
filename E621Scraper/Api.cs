@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Flurl.Http;
@@ -11,23 +11,28 @@ namespace E621Scraper
     public class Api
     {
         private const string BaseUrl = "https://e621.net/";
+        private readonly ApiConfig _config;
         private readonly string _apiKey;
         private readonly string _username;
 
-        public Api(string username, string apiKey)
+        public Api(ApiConfig config)
         {
-            if (string.IsNullOrWhiteSpace(username))
+            if(config == null)
             {
-                throw new ArgumentNullException(nameof(username));
+                throw new ArgumentNullException(nameof(config));
             }
 
-            if (string.IsNullOrWhiteSpace(apiKey))
+            if (string.IsNullOrWhiteSpace(config.Username))
             {
-                throw new ArgumentNullException(nameof(apiKey));
+                throw new ArgumentNullException(nameof(config.Username));
             }
 
-            _username = username;
-            _apiKey = apiKey;
+            if (string.IsNullOrWhiteSpace(config.Password))
+            {
+                throw new ArgumentNullException(nameof(config.Password));
+            }
+
+            this._config = config;
 
             FlurlHttp.Configure(settings =>
             {
@@ -104,7 +109,7 @@ namespace E621Scraper
 
         private IFlurlRequest Request()
         {
-            return BaseUrl.WithBasicAuth(_username, _apiKey)
+            return BaseUrl.WithBasicAuth(_config.Username, _config.Password)
                           .WithHeader("User-Agent", Config.UserAgent);
         }
     }
