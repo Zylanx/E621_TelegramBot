@@ -11,13 +11,13 @@ namespace E621Scraper
     public class Api
     {
         private const string BaseUrl = "https://e621.net/";
-        private readonly ApiConfig _config;
         private readonly string _apiKey;
+        private readonly ApiConfig _config;
         private readonly string _username;
 
         public Api(ApiConfig config)
         {
-            if(config == null)
+            if (config == null)
             {
                 throw new ArgumentNullException(nameof(config));
             }
@@ -27,12 +27,12 @@ namespace E621Scraper
                 throw new ArgumentNullException(nameof(config.Username));
             }
 
-            if (string.IsNullOrWhiteSpace(config.Password))
+            if (string.IsNullOrWhiteSpace(config.ApiKey))
             {
-                throw new ArgumentNullException(nameof(config.Password));
+                throw new ArgumentNullException(nameof(config.ApiKey));
             }
 
-            this._config = config;
+            _config = config;
 
             FlurlHttp.Configure(settings =>
             {
@@ -48,36 +48,42 @@ namespace E621Scraper
             });
         }
 
-        private Task<PostsCollection> ScrapeImagesBeforeId(int? id)
+        private async Task<PostsCollection> ScrapeImagesBeforeId(int? id)
         {
             if (id == null)
             {
-                return ScrapeImages();
+                return await ScrapeImages();
             }
 
-            return Request().AppendPathSegment("posts.json")
-                            .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"b{id}"})
-                            .GetJsonAsync<PostsCollection>();
+            await Task.Delay(1000);
+
+            return await Request().AppendPathSegment("posts.json")
+                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"b{id}"})
+                                  .GetJsonAsync<PostsCollection>();
         }
 
         // TODO: add a global ratelimit timer so that it is impossible to get limited
-        private Task<PostsCollection> ScrapeImagesAfterId(int? lastId)
+        private async Task<PostsCollection> ScrapeImagesAfterId(int? lastId)
         {
             if (lastId == null)
             {
-                return ScrapeImages();
+                return await ScrapeImages();
             }
 
-            return Request().AppendPathSegment("posts.json")
-                            .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"a{lastId}"})
-                            .GetJsonAsync<PostsCollection>();
+            await Task.Delay(1000);
+
+            return await Request().AppendPathSegment("posts.json")
+                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"a{lastId}"})
+                                  .GetJsonAsync<PostsCollection>();
         }
 
-        public Task<PostsCollection> ScrapeImages()
+        public async Task<PostsCollection> ScrapeImages()
         {
-            return Request().AppendPathSegment("posts.json")
-                            .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
-                            .GetJsonAsync<PostsCollection>();
+            await Task.Delay(1000);
+
+            return await Request().AppendPathSegment("posts.json")
+                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
+                                  .GetJsonAsync<PostsCollection>();
         }
 
 
@@ -97,8 +103,6 @@ namespace E621Scraper
                     break;
                 }
 
-                await Task.Delay(1000);
-
                 results.AddRange(posts);
 
                 lastPollId = posts[0].Id; //Get the next newest batch, keep going until there is no newer posts.
@@ -109,7 +113,7 @@ namespace E621Scraper
 
         private IFlurlRequest Request()
         {
-            return BaseUrl.WithBasicAuth(_config.Username, _config.Password)
+            return BaseUrl.WithBasicAuth(_config.Username, _config.ApiKey)
                           .WithHeader("User-Agent", Config.UserAgent);
         }
     }

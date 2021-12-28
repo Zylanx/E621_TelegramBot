@@ -1,53 +1,58 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using E621Shared;
+using Microsoft.Extensions.Hosting;
 
 namespace E621Scraper
 {
-    public class ScraperService : Microsoft.Extensions.Hosting.IHostedService
+    public class ScraperService : IHostedService
     {
         private readonly Api _api;
+        private readonly ScraperRepo _scraperRepo;
 
-        public ScraperService(Api api)
+        public ScraperService(Api api, ScraperRepo scraperRepo)
         {
-            this._api = api;
+            _api = api;
+            _scraperRepo = scraperRepo;
         }
 
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            //Get initial set of results
-            var results = (await _api.ScrapeImages()).Posts;
-
-            var lastPollId = 0;
-
+            // Should this be registering on ApplicationStarted or is this fine?
             while (true) //Simulate a rough polling loop, though we'll probably do this as a cronjob idk
             {
+                var results = await _api.GetImagesSinceLastPoll(await _scraperRepo.GetLastPolledId());
+
                 if (results.Count > 0)
                 {
-                    lastPollId = results.Select(x => x.Id).OrderBy(x => x).Last();
+                    await _scraperRepo.UpdateLastPolledId(results.Select(x => x.Id).OrderBy(x => x).Last());
+#if DEBUG
                     Console.WriteLine(
-                        $"Got {results.Count} images\nLast: {lastPollId}, Newest: {results.Last().Id}, Oldest: {results.First().Id}");
+                        $"Got {results.Count} images\nLast: {await _scraperRepo.GetLastPolledId()}, Newest: {results.Last().Id}, Oldest: {results.First().Id}");
+#endif
                 }
                 else
                 {
-                    Console.WriteLine($"No new posts to display yet! Last: {lastPollId}");
+                    Console.WriteLine("No new posts to display yet!");
+#if DEBUG
+                    Console.WriteLine("Last: {lastPollId}");
+#endif
                 }
-
-                results = await _api.GetImagesSinceLastPoll(lastPollId);
 
                 if (cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }
-                else
-                {
-                    await Task.Delay(5000); //could have just made this one bigger
 
-                }
+#if DEBUG
+                // TODO: Look into adding better cancellation support
+                await Task.Delay(5000);
+#else
+                await Task.Delay(TimeSpan.FromMinutes(1));
+#endif
             }
         }
 
