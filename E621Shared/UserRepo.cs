@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 
@@ -48,6 +49,15 @@ namespace E621Shared
 
             using var con = _con.Get();
             return (await con.QueryAsync<User>(query)).FirstOrDefault();
+        }
+
+        // TODO: Maybe make it an async enumerable?
+        public Task<IEnumerable<User>> ListAllUsers()
+        {
+            string query = "select * from Users";
+
+            using var con = _con.Get();
+            return con.QueryAsync<User>(query);
         }
     }
 }
