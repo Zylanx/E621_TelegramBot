@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -17,76 +16,83 @@ namespace E621TelegramBot
     {
         private readonly TelegramBotClient _botClient;
         private readonly ILogger<TelegramBotClient> _log;
-        public List<BotCommand> _commands { get; }
+        private readonly BotConfig _config;
 
-        public Bot(ILogger<TelegramBotClient> log)
+        public Bot(ILogger<TelegramBotClient> log, BotConfig config)
         {
             //todo: read from botconfig.
-            _botClient = new TelegramBotClient("");
             _log = log;
+            _config = config;
+            _botClient = new TelegramBotClient(config.ApiKey);
 
-            _commands = new List<BotCommand>();
-            _commands.Add(new BotCommand() { Command = "start", Description = "Get started" });
-            _commands.Add(new BotCommand {Command = "help", Description = "Receive help"});
+            Commands = new List<BotCommand>();
+            Commands.Add(new BotCommand {Command = "start", Description = "Get started"});
+            Commands.Add(new BotCommand {Command = "help", Description = "Receive help"});
         }
+
+        public List<BotCommand> Commands { get; }
 
         public async Task StartListening(CancellationToken cancellationToken)
         {
             // TODO: Handle cancellation token
-            
-            var receiverOptions = new ReceiverOptions
-            {
-                AllowedUpdates = { } // receive all update types
-            };
+
+            var receiverOptions = new ReceiverOptions();
             _botClient.StartReceiving(
-                    HandleUpdateAsync,
-                    HandleErrorAsync,
-                    receiverOptions,
-                    cancellationToken: cancellationToken);
+                HandleUpdateAsync,
+                HandleErrorAsync,
+                receiverOptions,
+                cancellationToken);
 
             var me = await _botClient.GetMeAsync(cancellationToken);
             _log.LogInformation($"Start listening for @{me.Username}");
 
             _log.LogDebug("Sending commands");
-            await _botClient.SetMyCommandsAsync(_commands, cancellationToken: cancellationToken);
+            await _botClient.SetMyCommandsAsync(Commands, cancellationToken: cancellationToken);
         }
 
-        async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+                                             CancellationToken cancellationToken)
         {
             // Only process Message updates: https://core.telegram.org/bots/api#message
             if (update.Type != UpdateType.Message)
+            {
                 return;
+            }
+
             // Only process text messages
             if (update.Message!.Type != MessageType.Text)
+            {
                 return;
+            }
 
             var chatId = update.Message.Chat.Id;
 
-            string help = string.Join("\r\n", _commands.Select(x => x.Command + " -- " + x.Description));
+            string help = string.Join("\r\n", Commands.Select(x => x.Command + " -- " + x.Description));
 
             //todo: proccess update.Message for commands in command list
 
             await botClient.SendTextMessageAsync(
-                   chatId: chatId,
-                   text: "Welcome to the bot, commands are",
-                   cancellationToken: cancellationToken);
+                chatId,
+                "Welcome to the bot, commands are",
+                cancellationToken: cancellationToken);
 
             await botClient.SendTextMessageAsync(
-                   chatId: chatId,
-                   text: help,
-                   cancellationToken: cancellationToken);
+                chatId,
+                help,
+                cancellationToken: cancellationToken);
         }
 
-        Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
+                                      CancellationToken cancellationToken)
         {
-            var ErrorMessage = exception switch
+            var errorMessage = exception switch
             {
                 ApiRequestException apiRequestException
                     => $"Telegram API Error:\n[{apiRequestException.ErrorCode}]\n{apiRequestException.Message}",
                 _ => exception.ToString()
             };
 
-            _log.LogError(ErrorMessage);
+            _log.LogError(errorMessage);
             return Task.CompletedTask;
         }
     }

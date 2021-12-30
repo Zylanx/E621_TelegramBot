@@ -8,8 +8,8 @@ namespace E621TelegramBot
 {
     public class TelegramBotHost : IHostedService
     {
-        private readonly ILogger<TelegramBotHost> _log;
         private readonly Bot _bot;
+        private readonly ILogger<TelegramBotHost> _log;
         private readonly ScraperRepo _scraperRepo;
 
         public TelegramBotHost(ScraperRepo scraperRepo, ILogger<TelegramBotHost> log, Bot bot)
