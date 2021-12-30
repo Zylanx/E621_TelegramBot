@@ -1,6 +1,6 @@
 ﻿namespace E621TelegramBot.Commands.System
 {
-    public class Start
+    public class Start : IBotCommand
     {
     }
 }

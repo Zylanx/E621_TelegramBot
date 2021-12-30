@@ -1,6 +1,6 @@
 ﻿namespace E621TelegramBot.Commands.Subscription
 {
-    public class ListSubscriptions
+    public class ListSubscriptions : IBotCommand
     {
     }
 }
