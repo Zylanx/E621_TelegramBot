@@ -23,7 +23,7 @@ namespace E621TelegramBot
             //todo: read from botconfig.
             _log = log;
             _config = config;
-            _botClient = new TelegramBotClient(config.ApiKey);
+            _botClient = new TelegramBotClient(_config.ApiKey);
 
             Commands = new List<BotCommand>();
             Commands.Add(new BotCommand {Command = "start", Description = "Get started"});
