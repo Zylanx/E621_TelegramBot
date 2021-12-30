@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -20,7 +21,6 @@ namespace E621TelegramBot
 
         public Bot(ILogger<TelegramBotClient> log, BotConfig config)
         {
-            //todo: read from botconfig.
             _log = log;
             _config = config;
             _botClient = new TelegramBotClient(_config.ApiKey);
