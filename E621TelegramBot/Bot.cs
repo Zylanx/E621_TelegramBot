@@ -20,11 +20,11 @@ namespace E621TelegramBot
         private readonly BotConfig _config;
         private readonly TelegramBotClient _botClient;
 
-        public Bot(ILogger<TelegramBotClient> logger, BotConfig config, CommandRegister commandRegister)
+        public Bot(ILogger<TelegramBotClient> logger, BotConfig config, IEnumerable<IBotCommand> commands)
         {
             _logger = logger;
             _config = config;
-            Commands = commandRegister.Commands;
+            Commands = commands.ToList();
             _botClient = new TelegramBotClient(_config.ApiKey);
         }
 
@@ -75,11 +75,6 @@ namespace E621TelegramBot
                 await botClient.SendTextMessageAsync(
                     chatId,
                     "Welcome to the bot, commands are\n" + help,
-                    cancellationToken: cancellationToken);
-
-                await botClient.SendTextMessageAsync(
-                    chatId,
-                    help,
                     cancellationToken: cancellationToken);
             }
         }
