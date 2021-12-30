@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using E621Shared;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Telegram.Bot;
 
 namespace E621TelegramBot
 {
@@ -18,7 +16,7 @@ namespace E621TelegramBot
         {
             _scraperRepo = scraperRepo;
             _log = log;
-            this._bot = bot;
+            _bot = bot;
         }
 
 
@@ -26,11 +24,6 @@ namespace E621TelegramBot
         {
             _log.LogInformation("Bot starting");
             await _bot.StartListening(cancellationToken);
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                await Task.Delay(1000);
-            }
         }
 
 
