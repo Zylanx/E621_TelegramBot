@@ -12,14 +12,11 @@ namespace E621TelegramBot
 {
     public static class Startup
     {
-        private static IConfigurationRoot? Configuration { get; set; }
-
         public static async Task Main(string[] args)
         {
-            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
-            Configuration = builder.Build();
-
             await Host.CreateDefaultBuilder(args)
+                      .ConfigureAppConfiguration(configurationBuilder =>
+                          configurationBuilder.AddJsonFile("appsettings.json", false, true))
                       .ConfigureServices(ConfigureServices)
                       .ConfigureLogging(ConfigureLogging)
                       .RunConsoleAsync();
@@ -28,22 +25,18 @@ namespace E621TelegramBot
 
         private static void ConfigureLogging(HostBuilderContext hostContext, ILoggingBuilder logging)
         {
-            logging.ClearProviders();
-            logging.AddConsole();
+            logging.ClearProviders()
+                   .AddConsole();
         }
 
         private static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json", false, true);
-
-            var configuration = builder.Build();
-
-            services.AddHostedService<TelegramBotHost>();
-            services.AddSingleton<ConnectionProvider>();
-            services.AddSingleton<Bot>();
-            services.AddTransient(_ => Config.DatabaseConfig);
-            services.AddTransient(_ => Configuration.GetRequiredSection("BotConfig").Get<BotConfig>());
-            services.AddTransient<ScraperRepo>();
+            services.AddHostedService<TelegramBotHost>()
+                    .AddSingleton<ConnectionProvider>()
+                    .AddSingleton<Bot>()
+                    .AddConfig(Config.DatabaseConfig)
+                    .AddConfig<BotConfig>()
+                    .AddTransient<ScraperRepo>();
         }
     }
 }
