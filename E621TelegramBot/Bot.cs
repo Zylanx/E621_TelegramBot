@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Extensions.Polling;
@@ -22,15 +23,17 @@ namespace E621TelegramBot
         {
             //todo: read from botconfig.
             _botClient = new TelegramBotClient("");
-            this._log = log;
+            _log = log;
 
             _commands = new List<BotCommand>();
             _commands.Add(new BotCommand() { Command = "start", Description = "Get started" });
-            _commands.Add(new BotCommand() { Command = "fuck", Description = "Make the bot fuck" });
+            _commands.Add(new BotCommand {Command = "help", Description = "Receive help"});
         }
 
         public async Task StartListening(CancellationToken cancellationToken)
         {
+            // TODO: Handle cancellation token
+            
             var receiverOptions = new ReceiverOptions
             {
                 AllowedUpdates = { } // receive all update types
@@ -41,12 +44,11 @@ namespace E621TelegramBot
                     receiverOptions,
                     cancellationToken: cancellationToken);
 
-            var me = await _botClient.GetMeAsync();
+            var me = await _botClient.GetMeAsync(cancellationToken);
             _log.LogInformation($"Start listening for @{me.Username}");
 
             _log.LogDebug("Sending commands");
-            await _botClient.SetMyCommandsAsync(_commands);
-
+            await _botClient.SetMyCommandsAsync(_commands, cancellationToken: cancellationToken);
         }
 
         async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
