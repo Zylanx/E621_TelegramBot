@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using E621Shared;
+using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
