@@ -6,27 +6,30 @@ using Microsoft.Extensions.Logging;
 
 namespace E621TelegramBot
 {
-    public class TelegramBotService : IHostedService
+    public class TelegramBotHost : IHostedService
     {
-        private readonly ILogger<TelegramBotService> _log;
+        private readonly Bot _bot;
+        private readonly ILogger<TelegramBotHost> _log;
         private readonly ScraperRepo _scraperRepo;
 
-        public TelegramBotService(ScraperRepo scraperRepo, ILogger<TelegramBotService> log)
+        public TelegramBotHost(ScraperRepo scraperRepo, ILogger<TelegramBotHost> log, Bot bot)
         {
             _scraperRepo = scraperRepo;
             _log = log;
+            _bot = bot;
         }
 
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             _log.LogInformation("Bot starting");
-            return Task.CompletedTask;
+            await _bot.StartListening(cancellationToken);
         }
+
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _log.LogInformation("Bot stoped");
+            _log.LogInformation("Bot stopped");
             return Task.CompletedTask;
         }
     }

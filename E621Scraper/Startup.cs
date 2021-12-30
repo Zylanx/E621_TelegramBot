@@ -25,20 +25,19 @@ namespace E621Scraper
 
         private static void ConfigureLogging(HostBuilderContext hostContext, ILoggingBuilder logging)
         {
-            logging.ClearProviders();
-            logging.AddConsole();
+            logging.ClearProviders()
+                   .AddConsole();
         }
 
         private static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            services.AddHostedService<ScraperService>();
-            services.AddSingleton<ConnectionProvider>();
-            services.AddTransient(provider => provider.GetRequiredService<IConfiguration>().BindSection<ApiConfig>());
-            services.AddTransient(_ => E621Shared.Config.DatabaseConfig);
-            services.AddTransient(
-                provider => provider.GetRequiredService<IConfiguration>().BindSection<ScraperConfig>());
-            services.AddTransient<ScraperRepo>();
-            services.AddTransient<Api.Api>();
+            services.AddHostedService<ScraperService>()
+                    .AddSingleton<ConnectionProvider>()
+                    .AddConfig<ApiConfig>()
+                    .AddConfig(E621Shared.Config.DatabaseConfig)
+                    .AddConfig<ScraperConfig>()
+                    .AddTransient<ScraperRepo>()
+                    .AddTransient<Api.Api>();
         }
     }
 }

@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using E621Scraper.Configs;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+
+// TODO: I think the cancellation checks should be put at the start, not strewn throughout.
 
 namespace E621Scraper.Api
 {
@@ -13,10 +17,12 @@ namespace E621Scraper.Api
     {
         private const string BaseUrl = "https://e621.net/";
         private readonly ApiConfig _config;
+        private readonly ILogger<Api> _logger;
 
-        public Api(ApiConfig config)
+        public Api(ApiConfig config, ILogger<Api> logger)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             FlurlHttp.Configure(settings =>
             {
@@ -32,66 +38,106 @@ namespace E621Scraper.Api
             });
         }
 
-        private async Task<PostsCollection> ScrapeImagesBeforeId(int? id)
+        private async Task<PostsCollection> ScrapeImagesBeforeId(int? id, CancellationToken cancellationToken = default)
         {
-            if (id == null)
+            try
             {
-                return await ScrapeImages();
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (id == null)
+                {
+                    return await ScrapeImages(cancellationToken);
+                }
+
+                await Task.Delay(1000, cancellationToken);
+
+                return await Request().AppendPathSegment("posts.json")
+                                      .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"b{id}"})
+                                      .GetJsonAsync<PostsCollection>(cancellationToken);
             }
-
-            await Task.Delay(1000);
-
-            return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"b{id}"})
-                                  .GetJsonAsync<PostsCollection>();
+            catch (TaskCanceledException)
+            {
+                _logger.LogDebug("ScrapeImagesBeforeId Cancelled");
+                throw;
+            }
         }
 
         // TODO: add a global ratelimit timer so that it is impossible to get limited
-        private async Task<PostsCollection> ScrapeImagesAfterId(int? lastId)
+        private async Task<PostsCollection> ScrapeImagesAfterId(int? lastId,
+                                                                CancellationToken cancellationToken = default)
         {
-            if (lastId == null)
+            try
             {
-                return await ScrapeImages();
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (lastId == null)
+                {
+                    return await ScrapeImages(cancellationToken);
+                }
+
+                await Task.Delay(1000, cancellationToken);
+
+                return await Request().AppendPathSegment("posts.json")
+                                      .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"a{lastId}"})
+                                      .GetJsonAsync<PostsCollection>(cancellationToken);
             }
-
-            await Task.Delay(1000);
-
-            return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = $"a{lastId}"})
-                                  .GetJsonAsync<PostsCollection>();
+            catch (TaskCanceledException)
+            {
+                _logger.LogDebug("ScrapeImagesAfterId Cancelled");
+                throw;
+            }
         }
 
-        private async Task<PostsCollection> ScrapeImages()
+        private async Task<PostsCollection> ScrapeImages(CancellationToken cancellationToken = default)
         {
-            await Task.Delay(1000);
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-            return await Request().AppendPathSegment("posts.json")
-                                  .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
-                                  .GetJsonAsync<PostsCollection>();
+                await Task.Delay(1000, cancellationToken);
+
+                return await Request().AppendPathSegment("posts.json")
+                                      .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
+                                      .GetJsonAsync<PostsCollection>(cancellationToken);
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.LogDebug("ScrapeImages Cancelled");
+                throw;
+            }
         }
-
 
         //Get all pages from last time we polled otherwise just get max pages.
         //The trick here is we have to keep fetching until we see lastPollId in the list then stop and remove any shit smaller than that.
-        public async Task<List<Post>> GetImagesSinceLastPoll(int? lastPollId)
+        // TODO: Improve cancellation handling.
+        public async Task<List<Post>> GetImagesSinceLastPoll(int? lastPollId,
+                                                             CancellationToken cancellationToken = default)
         {
-            List<Post> results = new();
-            while (true)
+            try
             {
-                var posts = (await ScrapeImagesAfterId(lastPollId)).Posts; //Gets posts in oldest to newest order.
-
-                if (posts.Count == 0)
+                List<Post> results = new();
+                while (true)
                 {
-                    //No posts, bail right away.
-                    break;
+                    var posts = (await ScrapeImagesAfterId(lastPollId, cancellationToken))
+                        .Posts; //Gets posts in oldest to newest order.
+
+                    if (posts.Count == 0)
+                    {
+                        //No posts, bail right away.
+                        break;
+                    }
+
+                    results.AddRange(posts);
+
+                    lastPollId = posts[0].Id; //Get the next newest batch, keep going until there is no newer posts.
                 }
 
-                results.AddRange(posts);
-
-                lastPollId = posts[0].Id; //Get the next newest batch, keep going until there is no newer posts.
+                return results; //done.
             }
-
-            return results; //done.
+            catch (TaskCanceledException)
+            {
+                return new List<Post>();
+            }
         }
 
         private IFlurlRequest Request()
