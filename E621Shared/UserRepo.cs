@@ -1,14 +1,16 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace E621Shared
 {
     public class User
     {
-        public string? UserId { get; set; }
+        [Key]
+        public long UserId { get; set; }
 
-        public string? ChatId { get; set; }
+        public long ChatId { get; set; }
         // public UserState? State { get; set; }
     }
 
@@ -25,7 +27,7 @@ namespace E621Shared
         private void Init()
         {
             string query =
-                "create table if not exists Users(Id INTEGER PRIMARY KEY, UserId TEXT, ChatId TEXT)";
+                "create table if not exists Users(UserId INTEGER PRIMARY KEY, ChatId INTEGER)";
 
             using var con = _con.Get();
             con.Execute(query);
@@ -35,19 +37,21 @@ namespace E621Shared
 
         public Task<int> CreateUser(User user)
         {
-            string query =
-                "INSERT INTO Users (UserId, ChatId) VALUES (@UserId, @ChatId)";
-
             using var con = _con.Get();
-            return con.ExecuteAsync(query, user);
+            return con.InsertAsync(user);
         }
 
-        public async Task<User?> GetUser(string userId)
+        public Task<User?> GetUser(long userId)
         {
-            string query = "SELECT * FROM Users WHERE UserId = @userId";
-
             using var con = _con.Get();
-            return (await con.QueryAsync<User>(query)).FirstOrDefault();
+            return con.GetAsync<User>(userId);
+        }
+
+        // TODO: Maybe make it an async enumerable?
+        public Task<IEnumerable<User>> ListAllUsers()
+        {
+            using var con = _con.Get();
+            return con.GetAllAsync<User>();
         }
     }
 }
