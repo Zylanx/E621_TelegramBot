@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using E621Shared;
+using E621TelegramBot.Commands;
 using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,8 +19,8 @@ namespace E621TelegramBot
             await Host.CreateDefaultBuilder(args)
                       .ConfigureAppConfiguration(configurationBuilder =>
                           configurationBuilder.AddJsonFile("appsettings.json", false, true))
-                      .ConfigureServices(ConfigureServices)
                       .ConfigureLogging(ConfigureLogging)
+                      .ConfigureServices(ConfigureServices)
                       .RunConsoleAsync();
         }
 
@@ -32,12 +33,13 @@ namespace E621TelegramBot
 
         private static void ConfigureServices(HostBuilderContext hostContext, IServiceCollection services)
         {
-            services.AddHostedService<TelegramBotHost>()
-                    .AddSingleton<ConnectionProvider>()
-                    .AddSingleton<Bot>()
-                    .AddConfig(Config.DatabaseConfig)
+            services.AddConfig(Config.DatabaseConfig)
                     .AddConfig<BotConfig>()
-                    .AddTransient<ScraperRepo>();
+                    .AddSingleton<ConnectionProvider>()
+                    .AddTransient<ScraperRepo>()
+                    .AddBotCommands()
+                    .AddHostedService<TelegramBotHost>()
+                    .AddSingleton<Bot>();
         }
     }
 }

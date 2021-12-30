@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using E621TelegramBot.Commands;
 using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -15,23 +16,20 @@ namespace E621TelegramBot
 {
     public class Bot
     {
-        private readonly TelegramBotClient _botClient;
-        private readonly ILogger<TelegramBotClient> _log;
+        private readonly ILogger<TelegramBotClient> _logger;
         private readonly BotConfig _config;
+        private readonly TelegramBotClient _botClient;
 
-        public Bot(ILogger<TelegramBotClient> log, BotConfig config)
+        public Bot(ILogger<TelegramBotClient> logger, BotConfig config, CommandRegister commandRegister)
         {
-            _log = log;
+            _logger = logger;
             _config = config;
+            Commands = commandRegister.Commands;
             _botClient = new TelegramBotClient(_config.ApiKey);
-
-            Commands = new List<BotCommand>();
-            Commands.Add(new BotCommand {Command = "start", Description = "Get started"});
-            Commands.Add(new BotCommand {Command = "help", Description = "Receive help"});
         }
 
-        public List<BotCommand> Commands { get; }
-
+        public List<IBotCommand> Commands { get; }
+        
         public async Task StartListening(CancellationToken cancellationToken)
         {
             // TODO: Handle cancellation token
@@ -43,11 +41,12 @@ namespace E621TelegramBot
                 receiverOptions,
                 cancellationToken);
 
+            _logger.LogDebug("Sending commands");
+            await _botClient.SetMyCommandsAsync(Commands.Select(command => command.ToBotCommand()),
+                cancellationToken: cancellationToken);
+            
             var me = await _botClient.GetMeAsync(cancellationToken);
-            _log.LogInformation($"Start listening for @{me.Username}");
-
-            _log.LogDebug("Sending commands");
-            await _botClient.SetMyCommandsAsync(Commands, cancellationToken: cancellationToken);
+            _logger.LogInformation($"Start listening for @{me.Username}");
         }
 
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
@@ -67,19 +66,22 @@ namespace E621TelegramBot
 
             var chatId = update.Message.Chat.Id;
 
-            string help = string.Join("\r\n", Commands.Select(x => x.Command + " -- " + x.Description));
+            string help = string.Join("\n", Commands.Select(x => x.Command + " -- " + x.Description));
 
             //todo: proccess update.Message for commands in command list
 
-            await botClient.SendTextMessageAsync(
-                chatId,
-                "Welcome to the bot, commands are",
-                cancellationToken: cancellationToken);
+            if (update.Message.Text is "/help" or "/start")
+            {
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    "Welcome to the bot, commands are\n" + help,
+                    cancellationToken: cancellationToken);
 
-            await botClient.SendTextMessageAsync(
-                chatId,
-                help,
-                cancellationToken: cancellationToken);
+                await botClient.SendTextMessageAsync(
+                    chatId,
+                    help,
+                    cancellationToken: cancellationToken);
+            }
         }
 
         private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
@@ -92,7 +94,7 @@ namespace E621TelegramBot
                 _ => exception.ToString()
             };
 
-            _log.LogError(errorMessage);
+            _logger.LogError(errorMessage);
             return Task.CompletedTask;
         }
     }
