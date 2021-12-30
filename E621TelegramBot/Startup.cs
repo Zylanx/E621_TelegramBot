@@ -37,6 +37,8 @@ namespace E621TelegramBot
                     .AddConfig<BotConfig>()
                     .AddSingleton<ConnectionProvider>()
                     .AddTransient<ScraperRepo>()
+                    .AddTransient<SubscriberRepo>()
+                    .AddTransient<UserRepo>()
                     .AddBotCommands()
                     .AddHostedService<TelegramBotHost>()
                     .AddSingleton<Bot>();

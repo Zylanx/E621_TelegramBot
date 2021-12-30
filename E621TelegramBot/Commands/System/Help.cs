@@ -1,5 +1,7 @@
-﻿using System;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace E621TelegramBot.Commands.System
 {
@@ -8,14 +10,11 @@ namespace E621TelegramBot.Commands.System
         public string Command { get; } = "help";
         public string Description { get; } = "Shows a list of commands and help with using them";
 
-        public Task<bool> Validate()
+        public Task Execute(Bot bot, TelegramBotClient botClient, Update update)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task Execute()
-        {
-            throw new NotImplementedException();
+            return botClient.SendTextMessageAsync(
+                update.Message!.Chat.Id,
+                string.Join("\n", bot.Commands.Select(x => x.Command + " -- " + x.Description)));
         }
     }
 }

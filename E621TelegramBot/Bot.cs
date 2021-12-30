@@ -16,9 +16,9 @@ namespace E621TelegramBot
 {
     public class Bot
     {
-        private readonly ILogger<TelegramBotClient> _logger;
-        private readonly BotConfig _config;
         private readonly TelegramBotClient _botClient;
+        private readonly BotConfig _config;
+        private readonly ILogger<TelegramBotClient> _logger;
 
         public Bot(ILogger<TelegramBotClient> logger, BotConfig config, IEnumerable<IBotCommand> commands)
         {
@@ -29,7 +29,7 @@ namespace E621TelegramBot
         }
 
         public List<IBotCommand> Commands { get; }
-        
+
         public async Task StartListening(CancellationToken cancellationToken)
         {
             // TODO: Handle cancellation token
@@ -44,7 +44,7 @@ namespace E621TelegramBot
             _logger.LogDebug("Sending commands");
             await _botClient.SetMyCommandsAsync(Commands.Select(command => command.ToBotCommand()),
                 cancellationToken: cancellationToken);
-            
+
             var me = await _botClient.GetMeAsync(cancellationToken);
             _logger.LogInformation($"Start listening for @{me.Username}");
         }
@@ -66,17 +66,38 @@ namespace E621TelegramBot
 
             var chatId = update.Message.Chat.Id;
 
-            string help = string.Join("\n", Commands.Select(x => x.Command + " -- " + x.Description));
-
             //todo: proccess update.Message for commands in command list
 
-            if (update.Message.Text is "/help" or "/start")
+            foreach (var command in Commands)
             {
-                await botClient.SendTextMessageAsync(
-                    chatId,
-                    "Welcome to the bot, commands are\n" + help,
-                    cancellationToken: cancellationToken);
+                try
+                {
+                    if (command.Validate(update))
+                    {
+                        try
+                        {
+                            await command.Execute(this, _botClient, update);
+                            return;
+                        }
+                        catch (NotImplementedException e)
+                        {
+                            await HandleErrorAsync(botClient, e, cancellationToken);
+                            return;
+                        }
+                    }
+                }
+                catch (NotImplementedException)
+                {
+                }
+                catch (Exception e)
+                {
+                    await HandleErrorAsync(botClient, e, cancellationToken);
+                }
             }
+
+            // TODO: Give this an actual exception class
+            await HandleErrorAsync(botClient, new InvalidOperationException("No command found for message"),
+                cancellationToken);
         }
 
         private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,

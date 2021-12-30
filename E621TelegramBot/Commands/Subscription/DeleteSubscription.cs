@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace E621TelegramBot.Commands.Subscription
 {
@@ -8,12 +10,7 @@ namespace E621TelegramBot.Commands.Subscription
         public string Command { get; } = "delete";
         public string Description { get; } = "Delete a subscription";
 
-        public Task<bool> Validate()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Execute()
+        public Task Execute(Bot bot, TelegramBotClient botClient, Update update)
         {
             throw new NotImplementedException();
         }

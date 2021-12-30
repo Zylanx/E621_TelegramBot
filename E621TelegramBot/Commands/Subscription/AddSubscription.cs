@@ -1,22 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
-using E621Shared;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace E621TelegramBot.Commands.Subscription
 {
     public class AddSubscription : IBotCommand
     {
-        private UserRepo _userRepo;
-        
         public string Command { get; } = "add";
         public string Description { get; } = "Add a subscription";
 
-        public Task<bool> Validate()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task Execute()
+        public Task Execute(Bot bot, TelegramBotClient botClient, Update update)
         {
             throw new NotImplementedException();
         }

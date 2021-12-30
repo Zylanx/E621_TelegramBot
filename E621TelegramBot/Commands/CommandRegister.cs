@@ -4,7 +4,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace E621TelegramBot.Commands
 {
-    public static class CommandRegisterExtension
+    // TODO: Add a command register which maps command text to commands and which handles command conflicts
+
+
+    public static class CommandRegistrationExtension
     {
         public static IServiceCollection AddBotCommands(this IServiceCollection serviceCollection)
         {
