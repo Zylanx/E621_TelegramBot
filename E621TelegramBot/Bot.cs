@@ -24,6 +24,12 @@ namespace E621TelegramBot
 
         public Bot(ILogger<TelegramBotClient> logger, BotConfig config, IEnumerable<IBotCommand> commands)
         {
+
+            if (string.IsNullOrEmpty(config.ApiKey))
+            {
+                throw new ArgumentException("Must configure an API key");
+            }
+
             _logger = logger;
             _config = config;
             Commands = commands.ToList();
