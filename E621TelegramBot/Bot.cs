@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using E621TelegramBot.Commands;
+using E621TelegramBot.Commands.System;
 using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -17,6 +18,7 @@ namespace E621TelegramBot
     public class Bot
     {
         private readonly TelegramBotClient _botClient;
+        private Help _helpCommand;
         private readonly BotConfig _config;
         private readonly ILogger<TelegramBotClient> _logger;
 
@@ -26,6 +28,8 @@ namespace E621TelegramBot
             _config = config;
             Commands = commands.ToList();
             _botClient = new TelegramBotClient(_config.ApiKey);
+            _helpCommand = new Help(Commands);
+            Commands.Add(_helpCommand);
         }
 
         public List<IBotCommand> Commands { get; }
@@ -64,41 +68,33 @@ namespace E621TelegramBot
                 return;
             }
 
-            var chatId = update.Message.Chat.Id;
-
-            //todo: proccess update.Message for commands in command list
-
-            foreach (var command in Commands)
+            try
             {
-                try
-                {
-                    if (command.Validate(update))
-                    {
-                        try
-                        {
-                            await command.Execute(this, _botClient, update);
-                            return;
-                        }
-                        catch (NotImplementedException e)
-                        {
-                            await HandleErrorAsync(botClient, e, cancellationToken);
-                            return;
-                        }
-                    }
-                }
-                catch (NotImplementedException)
-                {
-                }
-                catch (Exception e)
-                {
-                    await HandleErrorAsync(botClient, e, cancellationToken);
-                }
+                await HandleUpdateAsyncInternal(botClient, update, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                await HandleErrorAsync(botClient, ex, cancellationToken);
             }
 
-            // TODO: Give this an actual exception class
-            await HandleErrorAsync(botClient, new InvalidOperationException("No command found for message"),
-                cancellationToken);
         }
+
+
+        private async Task HandleUpdateAsyncInternal(ITelegramBotClient botClient, Update update,
+                                             CancellationToken cancellationToken)
+        {
+            var command = Commands.Where(x => x.Validate(update)).FirstOrDefault();
+            if (command == null)
+            {
+                await _helpCommand.Execute(botClient, update);
+            }
+            else
+            {
+
+                await command.Execute( botClient, update);
+            }
+        }
+
 
         private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception,
                                       CancellationToken cancellationToken)

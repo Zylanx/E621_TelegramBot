@@ -46,6 +46,6 @@ namespace E621TelegramBot.Commands
         }
 
         // TODO: This is only a stopgap. Need to come up with a better structure for this
-        public Task Execute(Bot bot, TelegramBotClient botClient, Update update);
+        public Task Execute(ITelegramBotClient botClient, Update update);
     }
 }
