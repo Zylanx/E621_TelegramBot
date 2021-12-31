@@ -3,6 +3,7 @@
 
 using System.Threading.Tasks;
 using E621Shared;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,7 +37,9 @@ namespace E621TelegramBot
                     .AddSingleton<Bot>()
                     .AddConfig(Config.DatabaseConfig)
                     .AddConfig<BotConfig>()
-                    .AddTransient<ScraperRepo>();
+                    .AddTransient<ScraperRepo>()
+                    .AddSingleton<IMemoryCache, MemoryCache>();
+            
         }
     }
 }
