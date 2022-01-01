@@ -22,8 +22,11 @@ namespace E621TelegramBot
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _log.LogInformation("Bot starting");
-            await _bot.StartListening(cancellationToken);
+            await Task.Run(async () =>
+            {
+                _log.LogInformation("Bot starting");
+                await _bot.StartListening(cancellationToken);
+            });
         }
 
 
