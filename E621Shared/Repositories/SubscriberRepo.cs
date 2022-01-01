@@ -71,12 +71,12 @@ namespace E621Shared.Repositories
             return con.QueryAsync<Subscription>(query, new {tags});
         }
 
-        public Task DeleteSubscription(long id, long telegramId) //Must pass user doing the delete request
+        public Task DeleteSubscription(long telegramId, string tag)
         {
-            string query = "Delete from Subscriptions where Id = @id and TelegramId = @telegramId";
+            string query = "DELETE FROM Subscriptions WHERE TelegramId = @telegramId and Tag = @tag";
 
             using var con = _con.Get();
-            return con.ExecuteAsync(query, new {id, userId = telegramId});
+            return con.ExecuteAsync(query, new {telegramId, tag});
         }
     }
 }
