@@ -1,10 +1,14 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using E621Scraper.Api;
 using E621Scraper.Configs;
 using E621Shared;
+using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 
 namespace E621Scraper
 {
@@ -15,14 +19,19 @@ namespace E621Scraper
         private readonly ILogger<ScraperService> _log;
         private readonly ScraperConfig _scraperConfig;
         private readonly ScraperRepo _scraperRepo;
+        private readonly SubscriberRepo _subRepo;
+        private readonly TelegramBotClient _botClient;
 
         public ScraperService(IHostApplicationLifetime lifetime, Api.Api api, ScraperRepo scraperRepo,
-                              ScraperConfig scraperConfig, ILogger<ScraperService> log)
+                              BotConfig botConfig, SubscriberRepo subRepo, ScraperConfig scraperConfig,
+                              ILogger<ScraperService> log)
         {
             _lifetime = lifetime;
             _api = api;
             _scraperRepo = scraperRepo;
+            _subRepo = subRepo;
             _scraperConfig = scraperConfig;
+            _botClient = new TelegramBotClient(botConfig.ApiKey);
             _log = log;
         }
 
@@ -54,6 +63,7 @@ namespace E621Scraper
                     await _scraperRepo.UpdateLastPolledId(results.Select(x => x.Id).OrderBy(x => x).Last());
                     _log.LogInformation(
                         $"Got {results.Count} images\nLast: {await _scraperRepo.GetLastPolledId()}, Newest: {results.Last().Id}, Oldest: {results.First().Id}");
+                    ProcessPosts(results);
                 }
                 else
                 {
@@ -73,6 +83,25 @@ namespace E621Scraper
                 {
                     return;
                 }
+            }
+        }
+
+        private async void PropagatePost(Post post)
+        {
+            foreach (var subscription in await _subRepo.ListAllSubscriptionsForTags(post.AllTags))
+            {
+                _log.LogDebug(
+                    $"Processing Subscription {subscription.TelegramId} {subscription.Tag} for tag {subscription.Tag} on post {post.Id}");
+                await _botClient.SendTextMessageAsync(subscription.TelegramId, $"https://e621.net/posts/{post.Id}");
+            }
+        }
+
+        private async Task ProcessPosts(List<Post> posts)
+        {
+            foreach (var post in posts)
+            {
+                // _log.LogDebug($"Processing post {post.Id}\n{string.Join("\n", post.AllTags)}");
+                PropagatePost(post);
             }
         }
     }
