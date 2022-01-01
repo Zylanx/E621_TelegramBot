@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
+using Dapper.Contrib.Extensions;
 
 namespace E621Shared
 {
     public class Subscription
     {
-        public string? TelegramId { get; set; }
-        public string? Tag { get; set; }
+        public long Id { get; set; }
+        public long TelegramId { get; set; }
+        public string Tag { get; set; } = null!;
     }
 
     public class SubscriberRepo
@@ -23,7 +25,7 @@ namespace E621Shared
         private void Init()
         {
             string query =
-                "create table if not exists Subscriptions(Id INTEGER PRIMARY KEY, UserId TEXT, Tag TEXT)";
+                "create table if not exists Subscriptions(Id INTEGER PRIMARY KEY, UserId INTEGER, Tag TEXT)";
 
             using var con = _con.Get();
             con.Execute(query);
@@ -32,9 +34,9 @@ namespace E621Shared
         //lets do command query seperation, stuff either modifies the dbase, or returns data, not both.
 
         //Allows the bot to list all your subscriptions
-        public Task<IEnumerable<Subscription>> ListSubscriptionsForTelegramUser(string userId)
+        public Task<IEnumerable<Subscription>> ListSubscriptionsForTelegramUser(long userId)
         {
-            string query = "select * from subscriptions where UserId = @userId";
+            string query = "select * from Subscriptions where UserId = @userId";
 
             using var con = _con.Get();
             return con.QueryAsync<Subscription>(query, new {userId});
@@ -42,24 +44,19 @@ namespace E621Shared
 
         public Task<int> CreateSubscription(Subscription subscription)
         {
-            string query =
-                "insert into subscription (UserId, Tag) values (@UserId, @Tag)";
-
             using var con = _con.Get();
-            return con.ExecuteAsync(query, subscription);
+            return con.InsertAsync(subscription);
         }
 
         public Task<IEnumerable<Subscription>> ListAllSubscriptions()
         {
-            string query = "select * from subscriptions";
-
             using var con = _con.Get();
-            return con.QueryAsync<Subscription>(query);
+            return con.GetAllAsync<Subscription>();
         }
 
-        public Task DeleteSubscription(int id, string userId) //Must pass user doing the delete request
+        public Task DeleteSubscription(long id, long userId) //Must pass user doing the delete request
         {
-            string query = "Delete from subscriptions where Id = @id and UserId = @userId";
+            string query = "Delete from Subscriptions where Id = @id and UserId = @userId";
 
             using var con = _con.Get();
             return con.ExecuteAsync(query, new {id, userId});
