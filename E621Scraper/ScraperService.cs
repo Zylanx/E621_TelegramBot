@@ -14,6 +14,9 @@ namespace E621Scraper
 {
     public class ScraperService : IHostedService
     {
+        private const int PostChunkSize = 10;
+        private const int TagChunkSize = 50;
+        
         private readonly Api.Api _api;
         private readonly IHostApplicationLifetime _lifetime;
         private readonly ILogger<ScraperService> _log;
@@ -86,22 +89,33 @@ namespace E621Scraper
             }
         }
 
-        private async void PropagatePost(Post post)
+        private async Task PropagatePost(Post post)
         {
-            foreach (var subscription in await _subRepo.ListAllSubscriptionsForTags(post.AllTags))
+            foreach (var subscriptionsChunk in (await _subRepo.ListAllSubscriptionsForTags(post.AllTags)).Chunk(
+                TagChunkSize))
             {
-                _log.LogDebug(
-                    $"Processing Subscription {subscription.TelegramId} {subscription.Tag} for tag {subscription.Tag} on post {post.Id}");
-                await _botClient.SendTextMessageAsync(subscription.TelegramId, $"https://e621.net/posts/{post.Id}");
+                var tasks = subscriptionsChunk.Select(subscription =>
+                {
+                    _log.LogDebug(
+                        $"Processing Subscription {subscription.TelegramId} {subscription.Tag} for tag {subscription.Tag} on post {post.Id}");
+                    return _botClient.SendTextMessageAsync(subscription.TelegramId,
+                        $"https://e621.net/posts/{post.Id}");
+                });
+
+                await Task.WhenAll(tasks);
             }
         }
 
         private async Task ProcessPosts(List<Post> posts)
         {
-            foreach (var post in posts)
+            foreach (var postsChunk in posts.Chunk(PostChunkSize))
             {
-                // _log.LogDebug($"Processing post {post.Id}\n{string.Join("\n", post.AllTags)}");
-                PropagatePost(post);
+                var tasks = postsChunk.Select(post =>
+                {
+                    _log.LogDebug($"Processing post {post.Id}");
+                    return PropagatePost(post);
+                });
+                await Task.WhenAll(tasks);
             }
         }
     }
