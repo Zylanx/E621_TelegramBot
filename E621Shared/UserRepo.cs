@@ -44,7 +44,7 @@ namespace E621Shared
         public Task<User?> GetUser(long userId)
         {
             using var con = _con.Get();
-            return con.GetAsync<User>(userId);
+            return con.GetAsync<User?>(userId);
         }
 
         // TODO: Maybe make it an async enumerable?
