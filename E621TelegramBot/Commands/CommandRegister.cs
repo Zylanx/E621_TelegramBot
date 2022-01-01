@@ -18,7 +18,10 @@ namespace E621TelegramBot.Commands
                      .ToList()
                      .ForEach(commands => commands.ToList().ForEach(type =>
                      {
-                         serviceCollection.AddTransient(typeof(IBotCommand), type);
+                         if (type != typeof(Commands.System.Help))
+                         {
+                             serviceCollection.AddTransient(typeof(IBotCommand), type);
+                         }
                      }));
 
             return serviceCollection;

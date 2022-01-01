@@ -10,7 +10,7 @@ namespace E621TelegramBot.Commands.Subscription
         public string Command { get; } = "add";
         public string Description { get; } = "Add a subscription";
 
-        public Task Execute(Bot bot, TelegramBotClient botClient, Update update)
+        public Task Execute(ITelegramBotClient botClient, Update update)
         {
             throw new NotImplementedException();
         }
