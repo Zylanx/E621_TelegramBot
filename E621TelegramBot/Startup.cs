@@ -1,6 +1,7 @@
 ﻿// This is a janky test, not intended to work well or be well documented.
 // Don't expect quality code.
 
+using System;
 using System.Threading.Tasks;
 using E621Shared;
 using E621TelegramBot.Commands;
@@ -22,6 +23,9 @@ namespace E621TelegramBot
                       .ConfigureLogging(ConfigureLogging)
                       .ConfigureServices(ConfigureServices)
                       .RunConsoleAsync();
+
+            Console.Write("Press any key to continue . . .");
+            Console.ReadKey();
         }
 
 
