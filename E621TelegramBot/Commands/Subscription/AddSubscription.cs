@@ -9,8 +9,8 @@ namespace E621TelegramBot.Commands.Subscription
 {
     public class AddSubscription : BaseBotCommand
     {
-        private readonly SubscriberRepo _subRepo;
         private readonly ILogger<AddSubscription> _logger;
+        private readonly SubscriberRepo _subRepo;
 
         public AddSubscription(SubscriberRepo subRepo, ILogger<AddSubscription> logger)
         {

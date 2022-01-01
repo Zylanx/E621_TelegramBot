@@ -18,12 +18,12 @@ namespace E621Scraper
         // private const int TagChunkSize = 200;
 
         private readonly Api.Api _api;
+        private readonly TelegramBotClient _botClient;
         private readonly IHostApplicationLifetime _lifetime;
         private readonly ILogger<ScraperService> _log;
         private readonly ScraperConfig _scraperConfig;
         private readonly ScraperRepo _scraperRepo;
         private readonly SubscriberRepo _subRepo;
-        private readonly TelegramBotClient _botClient;
 
         public ScraperService(IHostApplicationLifetime lifetime, Api.Api api, ScraperRepo scraperRepo,
                               BotConfig botConfig, SubscriberRepo subRepo, ScraperConfig scraperConfig,
