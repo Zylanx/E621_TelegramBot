@@ -23,7 +23,7 @@ namespace E621TelegramBot.Commands.Subscription
 
         public override async Task Execute(ITelegramBotClient botClient, Update update)
         {
-            _logger.LogInformation(
+            _logger.LogDebug(
                 $"Processing command - From: {update.Message.From.Id}({update.Message.From.Username}), Text: {update.Message.Text}");
             // TODO: Support more kinds of messages e.g. channel
             var commandText = update.Message!.Text!.ToLower().Split(" ");
@@ -33,14 +33,14 @@ namespace E621TelegramBot.Commands.Subscription
             if (commandText.Length == 1)
             {
                 response = "Invalid usage\nUsage: /delete <E621 Tag>";
-                _logger.LogInformation(
+                _logger.LogDebug(
                     $"Invalid Command - Not enough arguments: {update.Message.From.Id}({update.Message.From.Username})");
             }
             else if (commandText.Length > 2)
             {
                 response = "The command currently only supports deleting one subscription/tag at a time"
                          + "\nTo delete multiple subscriptions, send \"/delete <tag>\" for each tag";
-                _logger.LogInformation(
+                _logger.LogDebug(
                     $"Invalid Command - Too many arguments: {update.Message.From.Id}({update.Message.From.Username})");
             }
             else
@@ -59,7 +59,7 @@ namespace E621TelegramBot.Commands.Subscription
                 else
                 {
                     response = $"You do not have a subscription to \"{commandText[1]}\"";
-                    _logger.LogInformation(
+                    _logger.LogDebug(
                         $"Invalid Command - Tag not subscribed: {update.Message.From.Id}({update.Message.From.Username})");
                 }
             }
