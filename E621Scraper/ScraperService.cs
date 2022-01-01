@@ -72,7 +72,7 @@ namespace E621Scraper
 
                 try
                 {
-                    await Task.Delay((int)_scraperConfig.PollIntervalSeconds! * 1000, cancellationToken);
+                    await Task.Delay(_scraperConfig.PollInterval, cancellationToken);
                 }
                 catch (TaskCanceledException)
                 {
