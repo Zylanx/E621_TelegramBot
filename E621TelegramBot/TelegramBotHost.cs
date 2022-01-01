@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using E621Shared;
+using E621Shared.Repositories;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -22,8 +22,11 @@ namespace E621TelegramBot
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _log.LogInformation("Bot starting");
-            await _bot.StartListening(cancellationToken);
+            await Task.Run(async () =>
+            {
+                _log.LogInformation("Bot starting");
+                await _bot.StartListening(cancellationToken);
+            });
         }
 
 

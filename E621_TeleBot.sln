@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E621TelegramBot", "E621Tele
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "E621Shared", "E621Shared\E621Shared.csproj", "{22808D41-A0A0-46FA-8A18-B0816D9E351A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "E621CombinedRunner", "E621CombinedRunner\E621CombinedRunner.csproj", "{964A080A-DF29-49F6-95A2-635E9A429A7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{22808D41-A0A0-46FA-8A18-B0816D9E351A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22808D41-A0A0-46FA-8A18-B0816D9E351A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22808D41-A0A0-46FA-8A18-B0816D9E351A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{964A080A-DF29-49F6-95A2-635E9A429A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{964A080A-DF29-49F6-95A2-635E9A429A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{964A080A-DF29-49F6-95A2-635E9A429A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{964A080A-DF29-49F6-95A2-635E9A429A7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

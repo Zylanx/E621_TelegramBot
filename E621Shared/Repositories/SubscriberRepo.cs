@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Dapper.Contrib.Extensions;
 
-namespace E621Shared
+namespace E621Shared.Repositories
 {
     public class Subscription
     {
@@ -52,6 +52,23 @@ namespace E621Shared
         {
             using var con = _con.Get();
             return con.GetAllAsync<Subscription>();
+        }
+
+        public Task<IEnumerable<Subscription>> ListAllSubscriptionsForTag(string tag)
+        {
+            var query = "SELECT * FROM Subscriptions WHERE Tag = @tag";
+
+            using var con = _con.Get();
+            return con.QueryAsync<Subscription>(query, new {tag});
+        }
+
+        public Task<IEnumerable<Subscription>> ListAllSubscriptionsForTags(List<string> tags)
+        {
+            var query =
+                "SELECT Id, TelegramId, GROUP_CONCAT(Tag, \", \") AS Tag FROM Subscriptions WHERE Tag IN @tags GROUP BY TelegramId";
+
+            using var con = _con.Get();
+            return con.QueryAsync<Subscription>(query, new {tags});
         }
 
         public Task DeleteSubscription(long id, long telegramId) //Must pass user doing the delete request

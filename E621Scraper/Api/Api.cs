@@ -97,7 +97,7 @@ namespace E621Scraper.Api
                 await Task.Delay(1000, cancellationToken);
 
                 return await Request().AppendPathSegment("posts.json")
-                                      .SetQueryParams(new {limit = Config.MaxPostsPerRequest, page = "2"})
+                                      .SetQueryParams(new {limit = 50, page = "1"})
                                       .GetJsonAsync<PostsCollection>(cancellationToken);
             }
             catch (TaskCanceledException)

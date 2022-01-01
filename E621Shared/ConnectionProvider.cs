@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SQLite;
+using E621Shared.Configs;
 
 namespace E621Shared
 {

@@ -1,10 +1,12 @@
 ﻿// This is a janky test, not intended to work well or be well documented.
 // Don't expect quality code.
 
+using System;
 using System.Threading.Tasks;
 using E621Shared;
+using E621Shared.Configs;
+using E621Shared.Repositories;
 using E621TelegramBot.Commands;
-using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,6 +24,9 @@ namespace E621TelegramBot
                       .ConfigureLogging(ConfigureLogging)
                       .ConfigureServices(ConfigureServices)
                       .RunConsoleAsync();
+
+            Console.Write("Press any key to continue . . .");
+            Console.ReadKey();
         }
 
 
@@ -38,7 +43,6 @@ namespace E621TelegramBot
                     .AddSingleton<ConnectionProvider>()
                     .AddTransient<ScraperRepo>()
                     .AddTransient<SubscriberRepo>()
-                    .AddTransient<UserRepo>()
                     .AddBotCommands()
                     .AddHostedService<TelegramBotHost>()
                     .AddSingleton<Bot>();

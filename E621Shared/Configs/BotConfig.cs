@@ -1,4 +1,4 @@
-﻿namespace E621TelegramBot.Configuration
+﻿namespace E621Shared.Configs
 {
     public class BotConfig
     {

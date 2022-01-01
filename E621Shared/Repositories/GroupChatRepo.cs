@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Dapper;
 
-namespace E621Shared
+namespace E621Shared.Repositories
 {
     public class GroupChat
     {
