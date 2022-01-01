@@ -1,4 +1,6 @@
-﻿namespace E621Shared
+﻿using E621Shared.Configs;
+
+namespace E621Shared
 {
     public static class Config
     {

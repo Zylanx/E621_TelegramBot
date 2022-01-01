@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using E621Shared;
+using E621Shared.Repositories;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -55,7 +55,7 @@ namespace E621TelegramBot.Commands.Subscription
                 else
                 {
                     // TODO: This should be limited to protect against dumb shit
-                    await _subRepo.CreateSubscription(new E621Shared.Subscription
+                    await _subRepo.CreateSubscription(new E621Shared.Repositories.Subscription
                         {TelegramId = update.Message.From.Id, Tag = commandText[1]});
 
                     _logger.LogInformation(

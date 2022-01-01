@@ -4,8 +4,9 @@
 using System;
 using System.Threading.Tasks;
 using E621Shared;
+using E621Shared.Configs;
+using E621Shared.Repositories;
 using E621TelegramBot.Commands;
-using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

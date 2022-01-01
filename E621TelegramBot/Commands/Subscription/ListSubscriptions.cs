@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using E621Shared;
+using E621Shared.Repositories;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

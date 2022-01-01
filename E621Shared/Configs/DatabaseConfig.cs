@@ -1,4 +1,4 @@
-﻿namespace E621Shared
+﻿namespace E621Shared.Configs
 {
     public class DatabaseConfig
     {

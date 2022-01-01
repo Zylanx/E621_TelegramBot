@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Dapper;
 using Dapper.Contrib.Extensions;
 
-namespace E621Shared
+namespace E621Shared.Repositories
 {
     public class User
     {
