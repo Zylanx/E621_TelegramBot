@@ -7,7 +7,7 @@ namespace E621Shared
 {
     public class User
     {
-        [Key]
+        [ExplicitKey]
         public long UserId { get; set; }
 
         public long ChatId { get; set; }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace E621TelegramBot.Commands.System
+namespace E621TelegramBot.Commands.Telegram
 {
     public class Help : IBotCommand
     {
@@ -23,6 +23,7 @@ namespace E621TelegramBot.Commands.System
         {
             return botClient.SendTextMessageAsync(
                 update.Message!.Chat.Id,
+                "The available commands are:\n" +
                 string.Join("\n", _commands.Select(x => x.Command + " -- " + x.Description)));
         }
     }

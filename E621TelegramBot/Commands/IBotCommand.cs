@@ -36,7 +36,7 @@ namespace E621TelegramBot.Commands
         // It should also have some ability to set up access control for the different commands.
         // It should have a validation method that is executed before executing the function body.
         // TODO: We need to think about promises and related things. Otherwise there is no way to have a command await another message coming in.
-        // TODO: Add a "Register Cancelation Token" method.
+        // TODO: Add a "Register Cancellation Token" method.
         public string Command { get; }
         public string Description { get; }
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using E621TelegramBot.Commands;
-using E621TelegramBot.Commands.System;
+using E621TelegramBot.Commands.Telegram;
 using E621TelegramBot.Configuration;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
@@ -18,13 +18,12 @@ namespace E621TelegramBot
     public class Bot
     {
         private readonly TelegramBotClient _botClient;
-        private Help _helpCommand;
         private readonly BotConfig _config;
         private readonly ILogger<TelegramBotClient> _logger;
+        private readonly Help _helpCommand;
 
         public Bot(ILogger<TelegramBotClient> logger, BotConfig config, IEnumerable<IBotCommand> commands)
         {
-
             if (string.IsNullOrEmpty(config.ApiKey))
             {
                 throw new ArgumentException("Must configure an API key");
@@ -33,12 +32,13 @@ namespace E621TelegramBot
             _logger = logger;
             _config = config;
             Commands = commands.ToList();
+            _logger.LogInformation("Registered Commands\n\t" + string.Join("\n\t", Commands));
             _botClient = new TelegramBotClient(_config.ApiKey);
             _helpCommand = new Help(Commands);
             Commands.Add(_helpCommand);
         }
 
-        public List<IBotCommand> Commands { get; }
+        private List<IBotCommand> Commands { get; }
 
         public async Task StartListening(CancellationToken cancellationToken)
         {
@@ -82,23 +82,19 @@ namespace E621TelegramBot
             {
                 await HandleErrorAsync(botClient, ex, cancellationToken);
             }
-
         }
 
 
-        private async Task HandleUpdateAsyncInternal(ITelegramBotClient botClient, Update update,
-                                             CancellationToken cancellationToken)
+        private Task HandleUpdateAsyncInternal(ITelegramBotClient botClient, Update update,
+                                               CancellationToken cancellationToken)
         {
-            var command = Commands.Where(x => x.Validate(update)).FirstOrDefault();
-            if (command == null)
+            var task = Commands.FirstOrDefault(x => x.Validate(update)) switch
             {
-                await _helpCommand.Execute(botClient, update);
-            }
-            else
-            {
+                null => _helpCommand.Execute(botClient, update),
+                var command => command.Execute(botClient, update)
+            };
 
-                await command.Execute( botClient, update);
-            }
+            return task;
         }
 
 

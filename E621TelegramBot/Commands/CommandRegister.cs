@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using E621TelegramBot.Commands.Telegram;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace E621TelegramBot.Commands
@@ -18,7 +19,7 @@ namespace E621TelegramBot.Commands
                      .ToList()
                      .ForEach(commands => commands.ToList().ForEach(type =>
                      {
-                         if (type != typeof(Commands.System.Help))
+                         if (type != typeof(Help))
                          {
                              serviceCollection.AddTransient(typeof(IBotCommand), type);
                          }
