@@ -24,7 +24,7 @@ namespace E621TelegramBot.Commands.Subscription
         public override async Task Execute(ITelegramBotClient botClient, Update update)
         {
             _logger.LogInformation(
-                $"Processing command:\nFrom: {update.Message.From.Id}({update.Message.From.Username})\nText: {update.Message.Text}");
+                $"Processing command - From: {update.Message.From.Id}({update.Message.From.Username}), Text: {update.Message.Text}");
             // TODO: Support more kinds of messages e.g. channel
             var commandText = update.Message!.Text!.ToLower().Split(" ");
 
