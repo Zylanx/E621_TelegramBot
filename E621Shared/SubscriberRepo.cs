@@ -25,7 +25,7 @@ namespace E621Shared
         private void Init()
         {
             string query =
-                "create table if not exists Subscriptions(Id INTEGER PRIMARY KEY, UserId INTEGER, Tag TEXT)";
+                "create table if not exists Subscriptions(Id INTEGER PRIMARY KEY, TelegramId INTEGER, Tag TEXT)";
 
             using var con = _con.Get();
             con.Execute(query);
@@ -34,12 +34,12 @@ namespace E621Shared
         //lets do command query seperation, stuff either modifies the dbase, or returns data, not both.
 
         //Allows the bot to list all your subscriptions
-        public Task<IEnumerable<Subscription>> ListSubscriptionsForTelegramUser(long userId)
+        public Task<IEnumerable<Subscription>> ListSubscriptionsForTelegramUser(long telegramId)
         {
-            string query = "select * from Subscriptions where UserId = @userId";
+            string query = "select * from Subscriptions where TelegramId = @telegramId";
 
             using var con = _con.Get();
-            return con.QueryAsync<Subscription>(query, new {userId});
+            return con.QueryAsync<Subscription>(query, new {telegramId});
         }
 
         public Task<int> CreateSubscription(Subscription subscription)
@@ -54,12 +54,12 @@ namespace E621Shared
             return con.GetAllAsync<Subscription>();
         }
 
-        public Task DeleteSubscription(long id, long userId) //Must pass user doing the delete request
+        public Task DeleteSubscription(long id, long telegramId) //Must pass user doing the delete request
         {
-            string query = "Delete from Subscriptions where Id = @id and UserId = @userId";
+            string query = "Delete from Subscriptions where Id = @id and TelegramId = @telegramId";
 
             using var con = _con.Get();
-            return con.ExecuteAsync(query, new {id, userId});
+            return con.ExecuteAsync(query, new {id, userId = telegramId});
         }
     }
 }
