@@ -22,9 +22,6 @@ namespace E621CombinedRunner
     {
         public static async Task Main(string[] args)
         {
-            var scraperRepo = new ScraperRepo(new ConnectionProvider(Config.DatabaseConfig));
-            await scraperRepo.UpdateLastPolledId((await scraperRepo.GetLastPolledId() ?? int.MaxValue) - 50);
-
             await Host.CreateDefaultBuilder(args)
                       .ConfigureAppConfiguration(configurationBuilder =>
                           configurationBuilder.AddJsonFile("appsettings.json", false, true))
