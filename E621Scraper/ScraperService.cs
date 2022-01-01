@@ -97,7 +97,7 @@ namespace E621Scraper
                 var tasks = subscriptionsChunk.Select(subscription =>
                 {
                     _log.LogDebug(
-                        $"Processing Subscription {subscription.TelegramId} {subscription.Tag} for tag {subscription.Tag} on post {post.Id}");
+                        $"Processing Subscription {subscription.TelegramId} for tag {subscription.Tag} on post {post.Id}");
                     return _botClient.SendTextMessageAsync(subscription.TelegramId,
                         $"https://e621.net/posts/{post.Id}");
                 });
