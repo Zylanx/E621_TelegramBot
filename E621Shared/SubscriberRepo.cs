@@ -64,7 +64,8 @@ namespace E621Shared
 
         public Task<IEnumerable<Subscription>> ListAllSubscriptionsForTags(List<string> tags)
         {
-            var query = "SELECT * FROM Subscriptions WHERE Tag IN @tags";
+            var query =
+                "SELECT Id, TelegramId, GROUP_CONCAT(Tag, \", \") AS Tag FROM Subscriptions WHERE Tag IN @tags GROUP BY TelegramId";
 
             using var con = _con.Get();
             return con.QueryAsync<Subscription>(query, new {tags});
