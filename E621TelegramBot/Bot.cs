@@ -19,8 +19,8 @@ namespace E621TelegramBot
     {
         private readonly TelegramBotClient _botClient;
         private readonly BotConfig _config;
-        private readonly ILogger<TelegramBotClient> _logger;
         private readonly Help _helpCommand;
+        private readonly ILogger<TelegramBotClient> _logger;
 
         public Bot(ILogger<TelegramBotClient> logger, BotConfig config, IEnumerable<IBotCommand> commands)
         {
@@ -52,8 +52,8 @@ namespace E621TelegramBot
                 cancellationToken);
 
             _logger.LogDebug("Sending commands");
-            await _botClient.SetMyCommandsAsync(Commands.Select(command => command.ToBotCommand()),
-                cancellationToken: cancellationToken);
+            // await _botClient.SetMyCommandsAsync(Commands.Select(command => command.ToBotCommand()),
+            // cancellationToken: cancellationToken);
 
             var me = await _botClient.GetMeAsync(cancellationToken);
             _logger.LogInformation($"Start listening for @{me.Username}");
@@ -88,10 +88,12 @@ namespace E621TelegramBot
         private Task HandleUpdateAsyncInternal(ITelegramBotClient botClient, Update update,
                                                CancellationToken cancellationToken)
         {
-            var task = Commands.FirstOrDefault(x => x.Validate(update)) switch
+            var command = Commands.FirstOrDefault(x => x.Validate(update));
+
+            var task = command switch
             {
                 null => _helpCommand.Execute(botClient, update),
-                var command => command.Execute(botClient, update)
+                var commanda => commanda.Execute(botClient, update)
             };
 
             return task;

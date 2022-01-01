@@ -4,12 +4,15 @@ using Telegram.Bot.Types;
 
 namespace E621TelegramBot.Commands.Telegram
 {
-    public class Start : IBotCommand
+    public class Start : BaseBotCommand
     {
-        public string Command { get; } = "start";
-        public string Description { get; } = "Starts the bot";
+        public Start()
+        {
+            Command = "start";
+            Description = "Starts the bot";
+        }
 
-        public Task Execute(ITelegramBotClient botClient, Update update)
+        public override Task Execute(ITelegramBotClient botClient, Update update)
         {
             return botClient.SendTextMessageAsync(
                 update.Message!.Chat.Id,

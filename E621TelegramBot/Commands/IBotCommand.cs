@@ -40,10 +40,7 @@ namespace E621TelegramBot.Commands
         public string Command { get; }
         public string Description { get; }
 
-        public bool Validate(Update update) // Need to add in the arguments
-        {
-            return update.Message?.Text?.Contains("/" + Command.TrimStart('/')) ?? false;
-        }
+        public bool Validate(Update update); // Need to add in the arguments
 
         // TODO: This is only a stopgap. Need to come up with a better structure for this
         public Task Execute(ITelegramBotClient botClient, Update update);

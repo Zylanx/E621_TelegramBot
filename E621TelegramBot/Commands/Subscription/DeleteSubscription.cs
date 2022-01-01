@@ -5,12 +5,15 @@ using Telegram.Bot.Types;
 
 namespace E621TelegramBot.Commands.Subscription
 {
-    public class DeleteSubscription : IBotCommand
+    public class DeleteSubscription : BaseBotCommand
     {
-        public string Command { get; } = "delete";
-        public string Description { get; } = "Delete a subscription";
+        public DeleteSubscription()
+        {
+            Command = "delete";
+            Description = "Delete a subscription";
+        }
 
-        public Task Execute(ITelegramBotClient botClient, Update update)
+        public override Task Execute(ITelegramBotClient botClient, Update update)
         {
             throw new NotImplementedException();
         }

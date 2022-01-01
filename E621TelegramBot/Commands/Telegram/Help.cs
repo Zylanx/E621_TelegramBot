@@ -6,20 +6,19 @@ using Telegram.Bot.Types;
 
 namespace E621TelegramBot.Commands.Telegram
 {
-    public class Help : IBotCommand
+    public class Help : BaseBotCommand
     {
         private readonly List<IBotCommand> _commands;
 
-        public string Command { get; } = "help";
-        public string Description { get; } = "Shows a list of commands and help with using them";
-
-
         public Help(List<IBotCommand> commands)
         {
-            this._commands = commands;
+            Command = "help";
+            Description = "Shows a list of commands and help with using them";
+            _commands = commands;
         }
 
-        public Task Execute(ITelegramBotClient botClient, Update update)
+        // TODO: Add individual command help
+        public override Task Execute(ITelegramBotClient botClient, Update update)
         {
             return botClient.SendTextMessageAsync(
                 update.Message!.Chat.Id,
