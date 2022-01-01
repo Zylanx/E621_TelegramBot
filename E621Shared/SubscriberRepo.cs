@@ -54,6 +54,22 @@ namespace E621Shared
             return con.GetAllAsync<Subscription>();
         }
 
+        public Task<IEnumerable<Subscription>> ListAllSubscriptionsForTag(string tag)
+        {
+            var query = "SELECT * FROM Subscriptions WHERE Tag = @tag";
+
+            using var con = _con.Get();
+            return con.QueryAsync<Subscription>(query, new {tag});
+        }
+
+        public Task<IEnumerable<Subscription>> ListAllSubscriptionsForTags(List<string> tags)
+        {
+            var query = "SELECT * FROM Subscriptions WHERE Tag IN @tags";
+
+            using var con = _con.Get();
+            return con.QueryAsync<Subscription>(query, new {tags});
+        }
+
         public Task DeleteSubscription(long id, long telegramId) //Must pass user doing the delete request
         {
             string query = "Delete from Subscriptions where Id = @id and TelegramId = @telegramId";
