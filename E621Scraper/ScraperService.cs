@@ -66,7 +66,7 @@ namespace E621Scraper
                     await _scraperRepo.UpdateLastPolledId(results.Select(x => x.Id).OrderBy(x => x).Last());
                     _log.LogInformation(
                         $"Got {results.Count} images\nLast: {await _scraperRepo.GetLastPolledId()}, Newest: {results.Last().Id}, Oldest: {results.First().Id}");
-                    ProcessPosts(results);
+                    await ProcessPosts(results);
                 }
                 else
                 {

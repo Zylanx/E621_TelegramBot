@@ -18,6 +18,8 @@ using Config = E621Shared.Config;
 
 namespace E621CombinedRunner
 {
+    // TODO: Add a global blacklist
+    
     public static class Startup
     {
         public static async Task Main(string[] args)
