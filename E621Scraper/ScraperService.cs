@@ -111,7 +111,8 @@ namespace E621Scraper
                 _log.LogDebug(
                     $"Processing Subscription {subscription.TelegramId} for tag {subscription.Tag} on post {post.Id}");
                 return _botClient.SendTextMessageAsync(subscription.TelegramId,
-                    $"https://e621.net/posts/{post.Id}");
+                    $"https://e621.net/posts/{post.Id}",
+                    disableNotification: true); // TODO: Make disableNotification only set when there are more than one images sent in x cooldown time
             }));
         }
 
