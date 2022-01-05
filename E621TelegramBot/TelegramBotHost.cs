@@ -10,11 +10,9 @@ namespace E621TelegramBot
     {
         private readonly Bot _bot;
         private readonly ILogger<TelegramBotHost> _log;
-        private readonly ScraperRepo _scraperRepo;
 
-        public TelegramBotHost(ScraperRepo scraperRepo, ILogger<TelegramBotHost> log, Bot bot)
+        public TelegramBotHost(ILogger<TelegramBotHost> log, Bot bot)
         {
-            _scraperRepo = scraperRepo;
             _log = log;
             _bot = bot;
         }

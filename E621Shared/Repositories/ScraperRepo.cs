@@ -19,11 +19,9 @@ namespace E621Shared.Repositories
             string query = "create table if not exists Scraper(LastPolledId INTEGER)";
             //insert a null if row doesn't exist already.
             string query2 = "INSERT INTO Scraper (LastPolledId) SELECT NULL WHERE NOT EXISTS (SELECT * FROM Scraper)";
-            using (var con = _con.Get())
-            {
-                con.Execute(query);
-                con.Execute(query2);
-            }
+            var con = _con.Get();
+            con.Execute(query);
+            con.Execute(query2);
         }
 
         //lets do command query seperation, stuff either modifies the dbase, or returns data, not both.
@@ -32,15 +30,15 @@ namespace E621Shared.Repositories
         {
             string query = "select LastPolledId from Scraper";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             return (await con.QueryAsync<int?>(query)).First();
         }
 
         public Task<int> UpdateLastPolledId(int id)
         {
             string query = "update Scraper set LastPolledId = @id";
-            using var con = _con.Get();
-            return con.ExecuteAsync(query, new {id});
+            var con = _con.Get();
+            return con.ExecuteAsync(query, new { id });
         }
     }
 }
