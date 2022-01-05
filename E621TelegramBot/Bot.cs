@@ -77,6 +77,7 @@ namespace E621TelegramBot
                 using (TransactionScope transactionScope = new TransactionScope())
                 {
                     await HandleUpdateAsyncInternal(serviceScope, botClient, update, cancellationToken);
+                    transactionScope.Complete();
                 }
             }
             catch (Exception ex)
