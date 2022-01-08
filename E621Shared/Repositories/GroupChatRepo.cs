@@ -25,7 +25,7 @@ namespace E621Shared.Repositories
             string query =
                 "create table if not exists GroupChat(Id INTEGER PRIMARY KEY, UserId TEXT, ChatId TEXT)";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             con.Execute(query);
         }
 
@@ -36,7 +36,7 @@ namespace E621Shared.Repositories
             string query =
                 "INSERT INTO Users (TelegramId, ChatId) VALUES (@TelegramId, @ChatId)";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.ExecuteAsync(query, user);
         }
 
@@ -44,7 +44,7 @@ namespace E621Shared.Repositories
         {
             string query = "SELECT * FROM Users WHERE TelegramId = @telegramId";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             return (await con.QueryAsync<User>(query)).FirstOrDefault();
         }
     }

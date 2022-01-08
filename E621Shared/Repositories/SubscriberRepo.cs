@@ -27,7 +27,7 @@ namespace E621Shared.Repositories
             string query =
                 "create table if not exists Subscriptions(Id INTEGER PRIMARY KEY, TelegramId INTEGER, Tag TEXT)";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             con.Execute(query);
         }
 
@@ -38,19 +38,19 @@ namespace E621Shared.Repositories
         {
             string query = "select * from Subscriptions where TelegramId = @telegramId";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.QueryAsync<Subscription>(query, new {telegramId});
         }
 
         public Task<int> CreateSubscription(Subscription subscription)
         {
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.InsertAsync(subscription);
         }
 
         public Task<IEnumerable<Subscription>> ListAllSubscriptions()
         {
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.GetAllAsync<Subscription>();
         }
 
@@ -58,7 +58,7 @@ namespace E621Shared.Repositories
         {
             var query = "SELECT * FROM Subscriptions WHERE Tag = @tag";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.QueryAsync<Subscription>(query, new {tag});
         }
 
@@ -67,7 +67,7 @@ namespace E621Shared.Repositories
             var query =
                 "SELECT Id, TelegramId, GROUP_CONCAT(Tag, \", \") AS Tag FROM Subscriptions WHERE Tag IN @tags GROUP BY TelegramId";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.QueryAsync<Subscription>(query, new {tags});
         }
 
@@ -75,7 +75,7 @@ namespace E621Shared.Repositories
         {
             string query = "DELETE FROM Subscriptions WHERE TelegramId = @telegramId and Tag = @tag";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.ExecuteAsync(query, new {telegramId, tag});
         }
     }

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using E621Shared.Configs;
 using E621TelegramBot.Commands;
 using E621TelegramBot.Commands.Telegram;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Exceptions;
@@ -19,26 +21,21 @@ namespace E621TelegramBot
     {
         private readonly TelegramBotClient _botClient;
         private readonly BotConfig _config;
-        private readonly Help _helpCommand;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<TelegramBotClient> _logger;
 
-        public Bot(ILogger<TelegramBotClient> logger, BotConfig config, IEnumerable<IBotCommand> commands)
+        public Bot(ILogger<TelegramBotClient> logger, BotConfig config, IServiceProvider serviceProvider)
         {
             if (string.IsNullOrEmpty(config.ApiKey))
             {
                 throw new ArgumentException("Must configure an API key");
             }
-
+            serviceProvider.CreateScope();
             _logger = logger;
             _config = config;
-            Commands = commands.ToList();
-            _logger.LogInformation("Registered Commands\n\t" + string.Join("\n\t", Commands));
+            this._serviceProvider = serviceProvider;
             _botClient = new TelegramBotClient(_config.ApiKey);
-            _helpCommand = new Help(Commands);
-            Commands.Add(_helpCommand);
         }
-
-        private List<IBotCommand> Commands { get; }
 
         public async Task StartListening(CancellationToken cancellationToken)
         {
@@ -76,7 +73,12 @@ namespace E621TelegramBot
 
             try
             {
-                await HandleUpdateAsyncInternal(botClient, update, cancellationToken);
+                using (IServiceScope serviceScope = _serviceProvider.CreateScope())
+                using (TransactionScope transactionScope = new TransactionScope())
+                {
+                    await HandleUpdateAsyncInternal(serviceScope, botClient, update, cancellationToken);
+                    transactionScope.Complete();
+                }
             }
             catch (Exception ex)
             {
@@ -85,14 +87,16 @@ namespace E621TelegramBot
         }
 
 
-        private Task HandleUpdateAsyncInternal(ITelegramBotClient botClient, Update update,
+        private Task HandleUpdateAsyncInternal(IServiceScope serviceScope, ITelegramBotClient botClient, Update update,
                                                CancellationToken cancellationToken)
         {
-            var command = Commands.FirstOrDefault(x => x.Validate(update));
+            var commands = serviceScope.ServiceProvider.GetRequiredService<IEnumerable<IBotCommand>>().ToList();
+            var helpCommand = new Help(commands);
+            var command = commands.FirstOrDefault(x => x.Validate(update));
 
             var task = command switch
             {
-                null => _helpCommand.Execute(botClient, update),
+                null => helpCommand.Execute(botClient, update),
                 var commanda => commanda.Execute(botClient, update)
             };
 

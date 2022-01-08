@@ -29,7 +29,7 @@ namespace E621Shared.Repositories
             string query =
                 "create table if not exists Users(UserId INTEGER PRIMARY KEY, ChatId INTEGER)";
 
-            using var con = _con.Get();
+            var con = _con.Get();
             con.Execute(query);
         }
 
@@ -37,20 +37,20 @@ namespace E621Shared.Repositories
 
         public Task<int> CreateUser(User user)
         {
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.InsertAsync(user);
         }
 
         public Task<User?> GetUser(long userId)
         {
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.GetAsync<User?>(userId);
         }
 
         // TODO: Maybe make it an async enumerable?
         public Task<IEnumerable<User>> ListAllUsers()
         {
-            using var con = _con.Get();
+            var con = _con.Get();
             return con.GetAllAsync<User>();
         }
     }
